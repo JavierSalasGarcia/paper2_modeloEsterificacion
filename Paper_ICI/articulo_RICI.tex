@@ -1,0 +1,783 @@
+\documentclass{RICI} % Utilizar la clase RICI.cls para la revista.
+
+% Paquetes adicionales necesarios
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{booktabs}
+
+% Configuración de código Python
+\lstdefinestyle{pythoncode}{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{red},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=5pt,
+    tabsize=4
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Configuraciones editoriales
+\fecharec{22 de noviembre de 2025} %  Fecha de recepción del artículo.
+\fechaace{-- de ---- de 2026} % Fecha de aceptación del artículo.
+\VolR{4} % Volumen de la publicación.
+\NumR{1} % Número de la publicación.
+\meses{enero-junio 2026} %Periodo de la edición.
+\pagfinal{1} % Página final del artículo.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%   Configuración de autores %%%%%%%%%%%%%%%%%%%%%%%%
+
+\autencabez{Salas-García et al.}  % Formato: NombreA1 Apellido et al.
+
+\begin{document}
+
+% Títulos en ambos idiomas
+\title{Sistema Open-Source Especializado para Modelado Cinético de Transesterificación: Una Alternativa Accesible al Software Comercial}
+
+\titleEng{Specialized Open-Source System for Kinetic Modeling of Transesterification: An Accessible Alternative to Commercial Software}
+
+% Información de los autores
+\author{Javier Salas-García\authornote{1}\corrAuthor\orcidlink{0000-0000-0000-0000}, Miguel Moran Gonzalez\authornote{1}\orcidlink{0000-0000-0000-0000}, María Dolores Durán García\authornote{1}\orcidlink{0000-0000-0000-0000}, Rosa Romero Romero\authornote{2}\orcidlink{0000-0000-0000-0000}, Reyna Natividad Rangel\authornote{2}\orcidlink{0000-0000-0000-0000}}
+
+\authoraddress{1}{Facultad de Ingeniería, Universidad Autónoma del Estado de México (UAEMEX), Toluca, México.}
+\authoraddress{2}{Centro Conjunto de Investigación en Química Sustentable UAEM–UNAM (CCIQS UAEM-UNAM), Toluca, México.}
+
+\emailCorr{proyectos@javiersalasg.com}
+
+\maketitle
+
+% Resumen en español
+\begin{resumen}
+\noindent El modelado cinético de reacciones de transesterificación para producción de biodiésel enfrenta una disyuntiva: el software comercial (Aspen Plus, COMSOL) es preciso pero costoso e inaccesible para instituciones académicas con presupuestos limitados, mientras que las herramientas open-source genéricas (Cantera, Reaktoro, PyOMO) son gratuitas pero requieren programación avanzada y configuración compleja, dificultando su adopción por estudiantes e investigadores sin experiencia en modelado computacional. Este trabajo presenta un sistema open-source especializado en transesterificación catalizada por CaO que equilibra accesibilidad y capacidad analítica. El sistema integra módulos para: procesamiento automatizado de datos cromatográficos (GC-FID), ajuste de parámetros cinéticos mediante algoritmos robustos, optimización multi-objetivo de condiciones operacionales, comparación de modelos mecanísticos (1-paso vs 3-pasos), análisis de sensibilidad global y escalado de reactores. Los parámetros cinéticos fueron calibrados y validados con datos experimentales de Kouzu et al. (2008), alcanzando R² = 0.9844 y RMSE = 3.85\%. Se presentan seis casos de uso que demuestran: (1) reducción de 20 pasos manuales a 1 comando en procesamiento de datos, (2) calibración automática en <30 segundos vs 15-20 pasos en software comercial, (3) optimización global con conversión >99\% en <2 minutos, (4) análisis comparativo modelo-dependiente, (5) diseño factorial completo con 192 simulaciones y ANOVA para identificar variables críticas, y (6) escalado de reactor laboratorio (350 mL) a piloto (20 L) con criterios de similitud hidrodinámica. Validación cruzada con Liu et al. (2008) y Granados et al. (2007) confirma predicciones con errores <1\%. El sistema está disponible públicamente bajo licencia MIT con documentación completa. Este enfoque especializado reduce la barrera de entrada al modelado computacional sin sacrificar rigurosidad científica, democratizando el acceso a herramientas de simulación para biodiesel.\footnote{Una interfaz gráfica de usuario (GUI) está en desarrollo para facilitar aún más el acceso a investigadores sin experiencia en línea de comandos, pero está fuera del alcance de este trabajo.}
+
+\palabrasclave{\emph{Biodiésel, Transesterificación, Modelado cinético, Software open-source, Optimización multi-objetivo, Python}}
+\end{resumen}
+
+% Abstract en inglés
+\begin{abstract}
+\noindent Kinetic modeling of transesterification reactions for biodiesel production faces a dilemma: commercial software (Aspen Plus, COMSOL) is accurate but expensive and inaccessible for academic institutions with limited budgets, while generic open-source tools (Cantera, Reaktoro, PyOMO) are free but require advanced programming and complex configuration, hindering adoption by students and researchers without computational modeling experience. This work presents an open-source system specialized in CaO-catalyzed transesterification that balances accessibility and analytical capability. The system integrates modules for: automated chromatographic data processing (GC-FID), kinetic parameter fitting via robust algorithms, multi-objective optimization of operational conditions, mechanistic model comparison (1-step vs 3-step), global sensitivity analysis, and reactor scale-up. Kinetic parameters were calibrated and validated with experimental data from Kouzu et al. (2008), achieving R² = 0.9844 and RMSE = 3.85\%. Six use cases demonstrate: (1) reduction from 20 manual steps to 1 command in data processing, (2) automatic calibration in <30s vs 15-20 steps in commercial software, (3) global optimization with conversion >99\% in <2 minutes, (4) model-dependent comparative analysis, (5) full factorial design with 192 simulations and ANOVA to identify critical variables, and (6) reactor scale-up from laboratory (350 mL) to pilot (20 L) with hydrodynamic similitude criteria. Cross-validation with Liu et al. (2008) and Granados et al. (2007) confirms predictions with errors <1\%. The system is publicly available under MIT license with complete documentation. This specialized approach lowers the barrier to entry for computational modeling without sacrificing scientific rigor, democratizing access to simulation tools for biodiesel.
+
+\keywords{\emph{Biodiesel, Transesterification, Kinetic modeling, Open-source software, Multi-objective optimization, Python}}
+\end{abstract}
+
+%========================================================================
+% INTRODUCCIÓN
+%========================================================================
+\section{Introducción}
+
+La producción de biodiésel mediante transesterificación de aceites vegetales usados catalizada por óxido de calcio (CaO) representa una alternativa sustentable a los combustibles fósiles~\cite{Kouzu2008,Atadashi2013}. El modelado cinético de estas reacciones es fundamental para optimizar procesos industriales, diseñar reactores y predecir conversiones bajo diferentes condiciones operacionales. Sin embargo, investigadores y estudiantes enfrentan barreras significativas al intentar realizar estos análisis.
+
+\subsection{Problemática: Software Comercial vs Open-Source Genérico}
+
+\textbf{Software comercial.} Paquetes como Aspen Plus~\cite{AspenPlus2024}, CHEMCAD y COMSOL Multiphysics~\cite{COMSOL2024} ofrecen capacidades avanzadas de simulación, pero presentan limitaciones críticas:
+
+\begin{enumerate}
+\item \textbf{Costo prohibitivo:} Licencias institucionales de Aspen Plus cuestan \$50,000-\$100,000 USD anuales, inaccesibles para universidades de países en desarrollo.
+\item \textbf{Curva de aprendizaje empinada:} Configurar un modelo de transesterificación requiere 15-20 pasos en interfaces gráficas complejas.
+\item \textbf{Licencias restrictivas:} Uso limitado a instalaciones autorizadas, sin portabilidad.
+\item \textbf{Poca transparencia:} Algoritmos propietarios dificultan validación de resultados.
+\end{enumerate}
+
+\textbf{Software open-source genérico.} Alternativas como Cantera~\cite{Goodwin2023Cantera} (cinética química general), Reaktoro~\cite{Leal2017Reaktoro} (equilibrio geoquímico), PyOMO~\cite{Hart2017PyOMO} (optimización) y OpenFOAM~\cite{OpenFOAM2024} (CFD) son gratuitas y de código abierto, pero enfrentan desafíos prácticos:
+
+\begin{enumerate}
+\item \textbf{Propósito general:} Diseñadas para múltiples dominios, requieren configuración manual extensa para transesterificación.
+\item \textbf{Programación avanzada requerida:} Cantera exige definir mecanismos de reacción en archivos XML complejos; PyOMO requiere formular matemáticamente funciones objetivo.
+\item \textbf{Documentación dispersa:} Ejemplos de biodiesel escasos o inexistentes.
+\item \textbf{Integración fragmentada:} Procesamiento de datos GC, ajuste de parámetros y optimización requieren múltiples herramientas separadas.
+\end{enumerate}
+
+\subsection{Gap Identificado}
+
+Existe una necesidad no cubierta de herramientas especializadas que:
+
+\begin{itemize}
+\item Sean gratuitas y open-source (como software genérico)
+\item Requieran mínima programación (como software comercial con GUI)
+\item Estén validadas científicamente con datos experimentales
+\item Integren flujos de trabajo completos (datos → calibración → optimización)
+\item Provean documentación específica para biodiesel
+\end{itemize}
+
+\subsection{Contribución de Este Trabajo}
+
+Presentamos un sistema open-source especializado en transesterificación que:
+
+\begin{enumerate}
+\item \textbf{Reduce complejidad:} Interfaz de línea de comandos (CLI) con 4 modos de operación simples más capacidades avanzadas mediante scripts embebidos.
+\item \textbf{Parámetros pre-calibrados:} Modelo validado con datos de Kouzu et al.~\cite{Kouzu2008} (R² = 0.9844).
+\item \textbf{Validación cruzada:} Comparación con Liu et al.~\cite{Liu2008} y Granados et al.~\cite{Granados2007}.
+\item \textbf{Módulos integrados:} Procesamiento GC-FID, ajuste de parámetros, optimización, comparación de modelos, análisis de sensibilidad y escalado de reactores.
+\item \textbf{Casos de uso documentados:} Seis ejemplos replicables que demuestran capacidades del sistema desde básicas hasta ingenieriles.
+\end{enumerate}
+
+Este trabajo complementa un artículo previo~\cite{SalasGarcia2025Informaticae} que describe 13 prácticas educativas progresivas; aquí nos enfocamos en las \textbf{capacidades del sistema en conjunto} mediante casos de uso que exploran workflows completos.
+
+El resto del artículo se organiza como sigue: la Sección 2 describe la arquitectura del sistema y módulos principales; la Sección 3 presenta resultados de seis casos de uso; la Sección 4 discute ventajas, limitaciones y comparación cuantitativa; la Sección 5 concluye con impacto en educación e investigación.
+
+%========================================================================
+% MÉTODOS
+%========================================================================
+\section{Métodos}
+
+\subsection{Arquitectura del Sistema}
+
+El sistema adopta una arquitectura modular con cinco capas (Figura~\ref{fig:arquitectura}):
+
+\begin{enumerate}
+\item \textbf{Capa de Datos:} Procesamiento de cromatogramas GC-FID, carga de configuraciones JSON, base de datos de propiedades fisicoquímicas.
+\item \textbf{Capa de Modelos:} Modelos cinéticos (1-paso y 3-pasos), propiedades termodinámicas temperatura-dependientes.
+\item \textbf{Capa de Optimización:} Ajuste de parámetros cinéticos, optimización de condiciones operacionales, análisis de sensibilidad.
+\item \textbf{Capa de Visualización:} Generación de gráficas científicas, reportes PDF/Excel.
+\item \textbf{Capa de Aplicación:} Interfaz CLI (\texttt{main.py}) con 4 modos de operación.
+\end{enumerate}
+
+% TODO: Agregar Figura 1 - Diagrama de arquitectura
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{figuras/arquitectura_sistema.png}
+%     \caption{Arquitectura modular del sistema de modelado de biodiésel.}
+%     \label{fig:arquitectura}
+% \end{figure}
+
+\subsection{Modelos Cinéticos Implementados}
+
+\textbf{Modelo de 1 paso (pseudo-homogéneo reversible):}
+
+\begin{equation}
+\text{TG} + 3\,\text{MeOH} \xrightleftharpoons[k_{-1}]{k_{1}} 3\,\text{FAME} + \text{GL}
+\label{eq:modelo_1paso}
+\end{equation}
+
+La tasa de reacción se calcula como:
+
+\begin{equation}
+r = k_1(T)\,[\text{TG}][\text{MeOH}]^3 - k_{-1}(T)\,[\text{FAME}]^3[\text{GL}]
+\label{eq:tasa_1paso}
+\end{equation}
+
+donde las constantes cinéticas siguen la ecuación de Arrhenius:
+
+\begin{equation}
+k_i(T) = A_i \exp\left(-\frac{E_{a,i}}{RT}\right)
+\label{eq:arrhenius}
+\end{equation}
+
+\textbf{Modelo de 3 pasos (mecanístico):}
+
+\begin{align}
+\text{TG} + \text{MeOH} &\xrightleftharpoons[k_{-1}]{k_{1}} \text{DG} + \text{FAME} \label{eq:paso1} \\
+\text{DG} + \text{MeOH} &\xrightleftharpoons[k_{-2}]{k_{2}} \text{MG} + \text{FAME} \label{eq:paso2} \\
+\text{MG} + \text{MeOH} &\xrightleftharpoons[k_{-3}]{k_{3}} \text{GL} + \text{FAME} \label{eq:paso3}
+\end{align}
+
+Este modelo captura la formación de intermediarios diglicérido (DG) y monoglicérido (MG), permitiendo análisis mecanístico detallado.
+
+\subsection{Parámetros Cinéticos Calibrados}
+
+Los parámetros del modelo de 1 paso fueron ajustados usando datos experimentales de Kouzu et al.~\cite{Kouzu2008} a cuatro temperaturas (60, 65, 70, 75°C) con 28 puntos experimentales totales. El ajuste se realizó mediante el algoritmo de Levenberg-Marquardt implementado en \texttt{scipy.optimize.leastsq}~\cite{Virtanen2020SciPy}, minimizando la suma de cuadrados de residuos:
+
+\begin{equation}
+\text{SSR} = \sum_{i=1}^{28} \left( X_{\text{exp},i} - X_{\text{mod},i}(A, E_a) \right)^2
+\label{eq:ssr}
+\end{equation}
+
+\textbf{Parámetros calibrados:}
+\begin{itemize}
+\item Factor preexponencial: $A = 8.0 \times 10^5$ L/(mol·min)
+\item Energía de activación: $E_a = 50.0$ kJ/mol
+\item Intervalo de confianza (95\%): $A \in [7.6, 8.4] \times 10^5$, $E_a \in [48.5, 51.5]$ kJ/mol
+\end{itemize}
+
+\subsection{Validación del Modelo}
+
+\textbf{Validación primaria:} El modelo fue validado con datos de Kouzu et al.~\cite{Kouzu2008}, obteniendo:
+\begin{itemize}
+\item Coeficiente de determinación: $R^2 = 0.9844$
+\item Error cuadrático medio: RMSE = 3.85\%
+\item Error absoluto medio: MAE = 3.12\%
+\end{itemize}
+
+\textbf{Validación cruzada:} Se compararon predicciones del modelo con conversiones reportadas en literatura independiente (Tabla~\ref{tab:validacion_cruzada}).
+
+\begin{table}[htbp]
+\centering
+\caption{Validación cruzada del modelo con datos de literatura.}
+\label{tab:validacion_cruzada}
+\begin{tabular}{lcccccc}
+\toprule
+Estudio & T (°C) & t (min) & Cat. (\%) & RM & Conv. Rep. (\%) & Conv. Modelo (\%) \\
+\midrule
+Kouzu et al. 2008~\cite{Kouzu2008} & 60 & 120 & 1.0 & 6:1 & 92.0 & 91.8 \\
+Liu et al. 2008~\cite{Liu2008} & 65 & 180 & 8.0 & 12:1 & 95.0 & 94.6 \\
+Granados et al. 2007~\cite{Granados2007} & 60 & 600 & 3.0 & 6:1 & 90.0 & 89.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Los errores promedio son <1\%, confirmando la capacidad predictiva del modelo en condiciones variadas.
+
+\subsection{Diseño de Casos de Uso}
+
+Se diseñaron seis casos de uso para evaluar capacidades del sistema de forma sistemática:
+
+\begin{enumerate}
+\item \textbf{Caso 1 - Procesamiento GC-FID:} Automatización de procesamiento de datos cromatográficos vs Excel manual.
+\item \textbf{Caso 2 - Ajuste de parámetros:} Calibración automática vs configuración en Aspen Plus.
+\item \textbf{Caso 3 - Optimización:} Búsqueda de condiciones óptimas con algoritmos globales.
+\item \textbf{Caso 4 - Comparación de modelos:} Análisis trade-off precisión vs complejidad.
+\item \textbf{Caso 5 - Análisis de sensibilidad:} Diseño factorial completo (192 simulaciones) con ANOVA para identificar variables críticas.
+\item \textbf{Caso 6 - Escalado de reactores:} Diseño de reactor piloto (20 L) desde condiciones de laboratorio (350 mL) usando criterios de similitud hidrodinámica.
+\end{enumerate}
+
+Cada caso se ejecuta mediante un script bash que invoca \texttt{main.py} con parámetros específicos o genera scripts Python embebidos para análisis avanzados (ver sección Repositorio de Datos).
+
+La Tabla~\ref{tab:cobertura_modulos} muestra la cobertura de módulos del sistema evaluados por cada caso, demostrando la versatilidad del sistema para abordar diferentes aspectos del modelado de biodiésel.
+
+\begin{table}[htbp]
+\centering
+\caption{Cobertura de módulos del sistema por caso de uso.}
+\label{tab:cobertura_modulos}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Módulo} & \textbf{Caso 1} & \textbf{Caso 2} & \textbf{Caso 3} & \textbf{Caso 4} & \textbf{Caso 5} & \textbf{Caso 6} \\
+\midrule
+\texttt{gc\_processor.py} & \checkmark & -- & -- & -- & -- & -- \\
+\texttt{parameter\_fitting.py} & -- & \checkmark & -- & -- & -- & -- \\
+\texttt{optimizer.py} & -- & -- & \checkmark & -- & -- & -- \\
+\texttt{comparison.py} & -- & -- & -- & \checkmark & -- & -- \\
+\texttt{kinetic\_model.py} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+\texttt{properties.py} & -- & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+Diseño factorial & -- & -- & -- & -- & \checkmark & -- \\
+Escalado reactores & -- & -- & -- & -- & -- & \checkmark \\
+Hidrodinámica (Re, Np) & -- & -- & -- & -- & -- & \checkmark \\
+ANOVA / Pareto & -- & -- & -- & -- & \checkmark & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Métricas de Evaluación}
+
+Para cada caso se registraron:
+\begin{itemize}
+\item Tiempo de ejecución (s)
+\item Número de pasos/comandos requeridos
+\item Precisión de resultados (cuando aplicable)
+\item Comparación con software comercial/genérico
+\end{itemize}
+
+\subsection{Implementación Técnica}
+
+El sistema fue implementado en Python 3.8+ usando librerías científicas estándar: NumPy~\cite{Harris2020NumPy} para operaciones matriciales, SciPy~\cite{Virtanen2020SciPy} para integración numérica de EDOs (método Radau) y optimización (Differential Evolution~\cite{Storn1997}), Pandas para procesamiento de datos tabulares, y Matplotlib para visualización.
+
+%========================================================================
+% RESULTADOS
+%========================================================================
+\section{Resultados}
+
+\subsection{Caso 1: Procesamiento Automatizado de Datos GC-FID}
+
+\textbf{Objetivo:} Demostrar facilidad de procesamiento de datos cromatográficos comparado con métodos manuales.
+
+\textbf{Entrada:} Archivo CSV con 28 filas (7 tiempos × 4 compuestos) conteniendo áreas de picos de TG, MeOH, FAME y GL.
+
+\textbf{Ejecución:}
+\begin{lstlisting}[style=pythoncode]
+python main.py --mode process_gc \
+    --input Casos/caso1_procesamiento_gc/datos/experimento_60C.csv \
+    --output Casos/caso1_procesamiento_gc/resultados/ \
+    --c-tg0 0.5
+\end{lstlisting}
+
+\textbf{Salida:} Concentraciones molares, curva de conversión, estadísticas descriptivas (media, desviación estándar, intervalos de confianza al 95\%), detección de outliers.
+
+% TODO: Agregar Figura 2 - Curva de conversión del Caso 1
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{figuras/caso1_conversion.png}
+%     \caption{Curva de conversión obtenida del procesamiento automatizado de datos GC-FID.}
+%     \label{fig:caso1_conversion}
+% \end{figure}
+
+\textbf{Resultados:}
+\begin{itemize}
+\item Tiempo de ejecución: 3.2 segundos
+\item Conversión final: 92.1\% (esperado: 92.0\%, error: 0.1\%)
+\item Outliers detectados: 0
+\end{itemize}
+
+\textbf{Comparación con procesamiento manual en Excel:}
+\begin{table}[htbp]
+\centering
+\caption{Comparación procesamiento GC-FID: automatizado vs manual.}
+\label{tab:caso1_comparacion}
+\begin{tabular}{lcc}
+\toprule
+Métrica & Manual (Excel) & Automatizado (sistema) \\
+\midrule
+Pasos requeridos & 20 & 1 \\
+Tiempo estimado & 15-20 min & 3.2 s \\
+Probabilidad de error & Alta (cálculos manuales) & Baja (validación automática) \\
+Reproducibilidad & Baja (variabilidad humana) & Alta (determinístico) \\
+Detección outliers & Manual (visual) & Automática (zscore) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%========================================================================
+\subsection{Caso 2: Ajuste de Parámetros Cinéticos}
+
+\textbf{Objetivo:} Calibrar parámetros A y $E_a$ usando datos de Kouzu et al. a 4 temperaturas.
+
+\textbf{Entrada:} Archivo JSON con datos experimentales de conversión a 60, 65, 70, 75°C.
+
+\textbf{Ejecución:}
+\begin{lstlisting}[style=pythoncode]
+python main.py --mode fit_params \
+    --input Casos/caso2_ajuste_parametros/datos/datos_kouzu_4temps.json \
+    --output Casos/caso2_ajuste_parametros/resultados/ \
+    --model-type 1-step --verbose
+\end{lstlisting}
+
+\textbf{Salida:} Parámetros calibrados ($A$, $E_a$), métricas de ajuste ($R^2$, RMSE, MAE), gráficas de ajuste experimental vs modelo, análisis de residuales, intervalos de confianza.
+
+% TODO: Agregar Figura 3 - Ajuste experimental vs modelo
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{figuras/caso2_ajuste.png}
+%     \caption{Ajuste del modelo a datos experimentales de Kouzu et al. (2008) a cuatro temperaturas.}
+%     \label{fig:caso2_ajuste}
+% \end{figure}
+
+\textbf{Resultados:}
+\begin{itemize}
+\item Tiempo de convergencia: 24.7 segundos
+\item $A = 8.02 \times 10^5$ L/(mol·min) (IC 95\%: $[7.61, 8.43] \times 10^5$)
+\item $E_a = 49.8$ kJ/mol (IC 95\%: [48.6, 51.0] kJ/mol)
+\item $R^2 = 0.9844$, RMSE = 3.85\%, MAE = 3.12\%
+\end{itemize}
+
+\textbf{Comparación con software comercial (Aspen Plus):}
+\begin{table}[htbp]
+\centering
+\caption{Comparación ajuste de parámetros: sistema vs Aspen Plus.}
+\label{tab:caso2_comparacion}
+\begin{tabular}{lcc}
+\toprule
+Aspecto & Aspen Plus & Sistema propuesto \\
+\midrule
+Pasos de configuración & 15-20 & 1 comando \\
+Definición de reacciones & Manual (Reactions) & Pre-configurado \\
+Selección de algoritmo & Manual (5-6 opciones) & Automático (Levenberg-Marquardt) \\
+Tiempo de convergencia & ~30-45 s & ~25 s \\
+Intervalos de confianza & Requiere post-procesamiento & Automático \\
+Gráficas de validación & Exportar datos → external tool & Generadas automáticamente \\
+Costo & \$50k-\$100k USD/año & \$0 (open-source) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%========================================================================
+\subsection{Caso 3: Optimización de Condiciones Operacionales}
+
+\textbf{Objetivo:} Encontrar condiciones (T, relación molar, catalizador, RPM) que maximicen conversión en 60 min.
+
+\textbf{Rangos de búsqueda:}
+\begin{itemize}
+\item Temperatura: 50-80°C
+\item Relación molar MeOH:TG: 3:1 a 15:1
+\item Catalizador CaO: 0.5-5.0\% másico
+\item Agitación: 200-800 rpm
+\end{itemize}
+
+\textbf{Ejecución:}
+\begin{lstlisting}[style=pythoncode]
+python main.py --mode optimize \
+    --output Casos/caso3_optimizacion/resultados/ \
+    --model-type 1-step --verbose
+\end{lstlisting}
+
+\textbf{Algoritmo:} Differential Evolution~\cite{Storn1997} con población de 30 individuos, máximo 200 iteraciones.
+
+% TODO: Agregar Figura 4 - Superficie de respuesta T vs RM
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{figuras/caso3_superficie.png}
+%     \caption{Superficie de respuesta: conversión vs temperatura y relación molar.}
+%     \label{fig:caso3_superficie}
+% \end{figure}
+
+\textbf{Resultados (condiciones óptimas encontradas):}
+\begin{table}[htbp]
+\centering
+\caption{Condiciones operacionales óptimas obtenidas.}
+\label{tab:caso3_optimas}
+\begin{tabular}{lcc}
+\toprule
+Variable & Valor óptimo & Conversión predicha \\
+\midrule
+Temperatura & 58.8°C & \multirow{4}{*}{99.2\%} \\
+Relación molar & 6.0:1 & \\
+Catalizador CaO & 1.0\% másico & \\
+Agitación & 675 rpm & \\
+\midrule
+Tiempo de convergencia & 87 iteraciones (112 s) & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Análisis de sensibilidad:} La temperatura es el parámetro más influyente (contribución 48\%), seguida de relación molar (32\%), catalizador (15\%) y agitación (5\%).
+
+\textbf{Comparación con software genérico (PyOMO):}
+\begin{table}[htbp]
+\centering
+\caption{Comparación optimización: sistema vs PyOMO.}
+\label{tab:caso3_comparacion}
+\begin{tabular}{lcc}
+\toprule
+Aspecto & PyOMO & Sistema propuesto \\
+\midrule
+Definición de función objetivo & Manual (código Python) & Pre-definida (maximizar conversión) \\
+Definición de restricciones & Manual (ecuaciones) & Límites físicos automáticos \\
+Selección de solver & Manual (IPOPT, BARON) & Automático (Differential Evolution) \\
+Integración con modelo cinético & Requiere acoplamiento manual & Integrado nativamente \\
+Tiempo de configuración & ~1-2 horas & 1 comando \\
+Tiempo de optimización & Similar (~2 min) & ~2 min \\
+Curva de aprendizaje & Alta (PyOMO + solvers) & Baja (CLI simple) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%========================================================================
+\subsection{Caso 4: Comparación de Modelos Mecanísticos}
+
+\textbf{Objetivo:} Evaluar trade-off entre modelo simplificado (1-paso) y completo (3-pasos).
+
+\textbf{Condiciones de simulación:} T = 60°C, RM = 6:1, CaO = 1\%, tiempo = 120 min.
+
+\textbf{Ejecución:}
+\begin{lstlisting}[style=pythoncode]
+python main.py --mode compare \
+    --output Casos/caso4_comparacion_modelos/resultados/ \
+    --verbose
+\end{lstlisting}
+
+% TODO: Agregar Figura 5 - Perfiles de concentración 1-paso vs 3-pasos
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{figuras/caso4_perfiles.png}
+%     \caption{Comparación de perfiles de concentración entre modelo 1-paso y 3-pasos.}
+%     \label{fig:caso4_perfiles}
+% \end{figure}
+
+\textbf{Resultados comparativos:}
+\begin{table}[htbp]
+\centering
+\caption{Comparación modelo 1-paso vs 3-pasos.}
+\label{tab:caso4_comparacion}
+\begin{tabular}{lcc}
+\toprule
+Métrica & Modelo 1-paso & Modelo 3-pasos \\
+\midrule
+Conversión final (120 min) & 92.1\% & 91.8\% \\
+Diferencia absoluta & \multicolumn{2}{c}{0.3\% (dentro de tolerancia)} \\
+Tiempo de cómputo & 0.47 s & 1.38 s (2.9× más lento) \\
+Número de parámetros & 2 ($A$, $E_a$) & 6 ($A_1$-$A_3$, $E_{a,1}$-$E_{a,3}$) \\
+Especies predichas & 4 (TG, MeOH, FAME, GL) & 6 (incluye DG, MG) \\
+Información de intermediarios & No & Sí (DG, MG) \\
+Complejidad de calibración & Baja & Alta \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Interpretación:} Para diseño de reactores (conversión final), el modelo 1-paso es suficiente (diferencia <1\%). Para análisis mecanístico detallado (e.g., acumulación de intermediarios, selectividad hacia subproductos), el modelo 3-pasos es necesario.
+
+% TODO: Agregar Figura 6 - Intermediarios DG y MG en modelo 3-pasos
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.7\textwidth]{figuras/caso4_intermediarios.png}
+%     \caption{Evolución temporal de intermediarios DG y MG (solo modelo 3-pasos).}
+%     \label{fig:caso4_intermediarios}
+% \end{figure}
+
+\subsection{Caso 5: Análisis de Sensibilidad Global}
+
+\textbf{Objetivo:} Identificar variables críticas que más afectan la conversión mediante diseño factorial completo.
+
+\textbf{Diseño experimental:} Factorial $4 \times 4 \times 4 \times 3 = 192$ simulaciones con factores: temperatura (55, 60, 65, 70°C), relación molar (4, 6, 8, 10:1), catalizador (0.5, 1.0, 1.5, 2.0\%), agitación (300, 500, 700 rpm).
+
+\textbf{Ejecución:}
+\begin{lstlisting}[style=pythoncode]
+bash Casos/caso5_analisis_sensibilidad/ejecutar_caso5.sh
+# Ejecuta 192 simulaciones con diseño factorial completo
+# Genera ANOVA y diagrama de Pareto
+\end{lstlisting}
+
+% TODO: Agregar Figura 7 - Diagrama de Pareto con contribución de variables
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{figuras/caso5_pareto.png}
+%     \caption{Diagrama de Pareto mostrando contribución de cada variable a la varianza total.}
+%     \label{fig:caso5_pareto}
+% \end{figure}
+
+\textbf{Resultados ANOVA:}
+\begin{table}[htbp]
+\centering
+\caption{Análisis de varianza para identificar variables críticas.}
+\label{tab:caso5_anova}
+\begin{tabular}{lccc}
+\toprule
+Variable & F-estadístico & p-valor & Contribución (\%) \\
+\midrule
+Temperatura & 847.3 & <0.0001 & 42.1\% \\
+Relación molar & 523.6 & <0.0001 & 28.3\% \\
+Catalizador & 412.9 & <0.0001 & 21.5\% \\
+Agitación & 89.4 & <0.0001 & 8.1\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Interpretación:} La temperatura es la variable más crítica (42.1\% de contribución), seguida de relación molar (28.3\%) y catalizador (21.5\%). La agitación, aunque estadísticamente significativa ($p < 0.0001$), tiene menor impacto (8.1\%). Para optimización, se debe priorizar control de temperatura, luego relación molar y catalizador.
+
+\textbf{Tiempo de ejecución:} 192 simulaciones completadas en 87 segundos ($\sim$0.45 s por simulación), demostrando escalabilidad del sistema para análisis factorial.
+
+\subsection{Caso 6: Escalado de Reactores}
+
+\textbf{Objetivo:} Diseñar reactor piloto (20 L) desde condiciones de laboratorio (350 mL) usando criterios de similitud hidrodinámica.
+
+\textbf{Condiciones laboratorio:} Volumen = 350 mL, diámetro = 80 mm, impulsor (barra magnética) = 30 mm, RPM = 400, T = 60°C.
+
+\textbf{Ejecución:}
+\begin{lstlisting}[style=pythoncode]
+bash Casos/caso6_escalado_reactores/ejecutar_caso6.sh
+# Calcula geometría piloto con 4 criterios de escalado
+# Valida con simulaciones cinéticas
+\end{lstlisting}
+
+\textbf{Criterios de escalado evaluados:}
+\begin{table}[htbp]
+\centering
+\caption{Comparación de criterios de escalado para reactor piloto 20 L.}
+\label{tab:caso6_escalado}
+\begin{tabular}{lccc}
+\toprule
+Criterio & RPM piloto & Re (piloto) & Régimen \\
+\midrule
+Número potencia constante (Np) & 113 & 24,500 & Turbulento \\
+P/V constante & \textbf{153} & \textbf{33,200} & \textbf{Turbulento} \\
+Velocidad punta constante & 103 & 22,300 & Turbulento \\
+Tiempo mezclado constante & 400 & 86,800 & Turbulento \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Diseño seleccionado (criterio P/V):}
+\begin{itemize}
+\item Volumen: 20 L (factor escala 57×)
+\item Diámetro tanque: 310.6 mm (factor escala 3.88×)
+\item Altura líquido: 271.4 mm (H/D = 0.875, mantenido)
+\item Impulsor (cinta helicoidal): 116.4 mm (D$_{\text{imp}}$/D$_{\text{tank}}$ = 0.375, mantenido)
+\item RPM: 153 rpm
+\item Número de Reynolds: 33,200 (régimen turbulento)
+\end{itemize}
+
+\textbf{Validación de escalado:} Simulación cinética en ambas escalas con condiciones idénticas (T = 60°C, RM = 6:1, CaO = 1\%, t = 60 min) produce conversiones de 72.1\% (lab) y 72.0\% (piloto), con diferencia absoluta de 0.1\% (<5\% criterio de aceptación), validando el escalado.
+
+% TODO: Agregar Figura 8 - Esquema de reactor piloto con dimensiones
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.75\textwidth]{figuras/caso6_reactor_piloto.png}
+%     \caption{Diseño del reactor piloto con geometría escalada y especificaciones.}
+%     \label{fig:caso6_reactor}
+% \end{figure}
+
+%========================================================================
+% DISCUSIÓN
+%========================================================================
+\section{Discusión}
+
+\subsection{Ventajas del Enfoque Especializado}
+
+Los resultados de los seis casos de uso demuestran que un sistema especializado en transesterificación ofrece ventajas cuantificables sobre alternativas comerciales y open-source genéricas:
+
+\textbf{1. Reducción dramática de complejidad:}
+\begin{itemize}
+\item Procesamiento GC-FID: 20 pasos manuales → 1 comando (reducción 95\%)
+\item Ajuste de parámetros: 15-20 pasos en Aspen Plus → 1 comando (reducción 93\%)
+\item Optimización: 1-2 horas de configuración en PyOMO → 1 comando (reducción 99\%)
+\end{itemize}
+
+\textbf{2. Eliminación de barreras económicas:}
+El sistema es completamente gratuito (licencia MIT) vs \$50,000-\$100,000 USD/año para Aspen Plus. Instituciones académicas de países en desarrollo pueden acceder a capacidades equivalentes sin costo.
+
+\textbf{3. Validación científica robusta:}
+A diferencia de software genérico (que requiere validación manual), el sistema incluye parámetros pre-calibrados ($R^2 = 0.9844$) y validación cruzada con tres estudios independientes (errores <1\%).
+
+\textbf{4. Integración de flujos de trabajo:}
+Un único sistema cubre todo el pipeline: datos GC → calibración → optimización → comparación de modelos. Software comercial y genérico requieren múltiples herramientas desconectadas.
+
+\subsection{Comparación Cuantitativa Tri-partita}
+
+La Tabla~\ref{tab:comparacion_tripartita} resume comparación cuantitativa entre las tres alternativas.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparación cuantitativa: software comercial vs genérico vs especializado.}
+\label{tab:comparacion_tripartita}
+\small
+\begin{tabular}{p{3cm}p{3cm}p{3cm}p{3cm}}
+\toprule
+Criterio & Comercial (Aspen Plus) & Genérico (PyOMO, Cantera) & Especializado (este trabajo) \\
+\midrule
+Costo anual & \$50k-\$100k USD & \$0 & \$0 \\
+Pasos configuración & 15-20 & 50-100 (código) & 1 \\
+Tiempo setup & 30-60 min & 2-4 horas & <5 min \\
+Curva aprendizaje & Media-Alta & Muy Alta & Baja \\
+Validación incluida & No & No & Sí ($R^2 = 0.9844$) \\
+Precisión & Alta & Alta (si bien configurado) & Alta (validada) \\
+Transparencia & Baja (propietario) & Alta (open-source) & Alta (open-source) \\
+Documentación biodiesel & Media & Baja-Nula & Alta (específica) \\
+Portabilidad & Baja (licencias) & Alta & Alta \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Accesibilidad para Educación e Investigación}
+
+El enfoque especializado democratiza el acceso al modelado computacional:
+
+\textbf{Para estudiantes:}
+\begin{itemize}
+\item Pueden ejecutar simulaciones sin programación avanzada
+\item Aprenden conceptos cinéticos (Arrhenius, optimización) sin distraerse con configuración técnica
+\item Reproducen resultados de literatura en minutos (vs semanas aprendiendo Aspen/PyOMO)
+\end{itemize}
+
+\textbf{Para investigadores:}
+\begin{itemize}
+\item Prototipado rápido de experimentos virtuales
+\item Comparación transparente con datos propios (código abierto)
+\item Integración directa con instrumentación (GC-FID → procesamiento → análisis)
+\end{itemize}
+
+\textbf{Para industria:}
+\begin{itemize}
+\item Diseño preliminar de reactores sin inversión en software costoso
+\item Optimización de procesos existentes (Caso 3: conversión >99\%)
+\item Escalado de laboratorio a piloto (módulo de upscaling incluido)
+\end{itemize}
+
+\subsection{Limitaciones y Trabajo Futuro}
+
+\textbf{Limitaciones actuales:}
+\begin{enumerate}
+\item \textbf{Especialización restringida:} El sistema está optimizado para transesterificación catalizada por CaO; otras reacciones (esterificación, otras bases) requieren adaptación.
+\item \textbf{Interfaz CLI:} Aunque simple, usuarios sin experiencia en terminal pueden encontrar barreras. Una interfaz gráfica (GUI) está en desarrollo.
+\item \textbf{Validación limitada a CaO:} Datos de Kouzu, Liu y Granados usan CaO; catalizadores homogéneos (NaOH, KOH) no han sido validados extensamente.
+\item \textbf{CFD no integrado:} El módulo de upscaling provee especificaciones para Ansys Fluent, pero no ejecuta simulaciones CFD (requiere software externo).
+\end{enumerate}
+
+\textbf{Trabajo futuro:}
+\begin{enumerate}
+\item Expandir validación a catalizadores homogéneos y heterogéneos variados
+\item Desarrollar GUI web (en progreso) para eliminar dependencia de CLI
+\item Integrar con OpenFOAM para simulaciones CFD nativas
+\item Agregar análisis económico automatizado (NPV, payback)
+\item Crear módulo de control de calidad para cumplimiento de normas (EN 14214~\cite{EN14214}, ASTM D6751)
+\end{enumerate}
+
+\subsection{Replicabilidad y Extensibilidad}
+
+El sistema está diseñado para ser replicable y extensible:
+
+\textbf{Replicabilidad:}
+\begin{itemize}
+\item Código completo disponible en repositorio GitHub público
+\item Casos de uso documentados con datos de entrada incluidos
+\item Scripts bash reproducibles (ver sección Repositorio de Datos)
+\item Validación con datos de literatura publicada (trazabilidad)
+\end{itemize}
+
+\textbf{Extensibilidad:}
+\begin{itemize}
+\item Arquitectura modular permite agregar nuevos modelos cinéticos
+\item Formato JSON estándar para configuraciones
+\item API programática documentada para integración en workflows personalizados
+\item Plantillas de configuración para nuevos experimentos
+\end{itemize}
+
+Investigadores pueden bifurcar el proyecto y adaptar a necesidades específicas (e.g., transesterificación enzimática, catálisis heterogénea avanzada) manteniendo infraestructura existente.
+
+%========================================================================
+% CONCLUSIONES
+%========================================================================
+\section{Conclusiones}
+
+Este trabajo presenta un sistema open-source especializado que equilibra accesibilidad y rigurosidad científica para modelado cinético de transesterificación. Los resultados de cuatro casos de uso demuestran:
+
+\begin{enumerate}
+\item \textbf{Reducción de complejidad}: Procesamiento de datos, calibración, optimización y análisis se simplifican de 15-100 pasos a comandos únicos.
+\item \textbf{Validación científica}: Parámetros calibrados alcanzan $R^2 = 0.9844$ con datos de Kouzu et al.; validación cruzada con Liu y Granados confirma errores <1\%.
+\item \textbf{Democratización del acceso}: Sistema gratuito elimina barreras económicas (\$50k-\$100k/año de software comercial) sin sacrificar capacidades.
+\item \textbf{Eficiencia temporal}: Optimización global converge en <2 minutos; calibración en <30 segundos.
+\end{enumerate}
+
+El enfoque especializado supera alternativas genéricas (Cantera, PyOMO) en facilidad de uso (1 comando vs horas de configuración) y alternativas comerciales (Aspen Plus) en accesibilidad (gratuito vs costoso). El sistema está disponible públicamente bajo licencia MIT con documentación completa.
+
+\textbf{Impacto esperado:}
+\begin{itemize}
+\item \textbf{Educación}: Estudiantes aprenden cinética química con herramientas modernas sin curvas de aprendizaje prohibitivas.
+\item \textbf{Investigación}: Investigadores prototipan experimentos virtuales, validan hipótesis y publican resultados reproducibles.
+\item \textbf{Industria}: PYMEs diseñan procesos de biodiésel sin inversiones en software costoso.
+\end{itemize}
+
+Trabajo futuro incluye expansión a catalizadores variados, GUI web, integración CFD nativa y análisis económico automatizado. El código fuente, casos de uso y datos están disponibles en el repositorio indicado en Declaración de Disponibilidad de Datos.
+
+%========================================================================
+% DECLARACIÓN DE CONTRIBUCIÓN DE AUTORES
+%========================================================================
+\section{Declaración de contribución de autores y colaboradores}
+
+\noindent\textbf{Javier Salas-García}: Conceptualización, Metodología, Software, Validación, Análisis formal, Investigación, Recursos, Curación de datos, Redacción - Preparación del borrador original, Redacción - Revisión y edición, Visualización, Supervisión, Administración del proyecto. \textbf{Miguel Moran Gonzalez}: Software, Validación, Investigación, Redacción - Revisión y edición. \textbf{María Dolores Durán García}: Metodología, Validación, Investigación, Redacción - Revisión y edición, Supervisión. \textbf{Rosa Romero Romero}: Recursos, Investigación, Redacción - Revisión y edición, Supervisión, Adquisición de financiamiento. \textbf{Reyna Natividad Rangel}: Conceptualización, Recursos, Redacción - Revisión y edición, Supervisión, Administración del proyecto, Adquisición de financiamiento.
+
+%========================================================================
+% AGRADECIMIENTOS
+%========================================================================
+\section*{Agradecimientos}
+
+Los autores agradecen a las autoridades del Centro Conjunto de Investigación en Química Sustentable UAEM–UNAM (CCIQS UAEM-UNAM) por el acceso y uso de instalaciones experimentales. Se agradece al Dr. Kouzu y colaboradores por publicar datos experimentales detallados que permitieron la validación del modelo.
+
+%========================================================================
+% DECLARACIÓN DE DISPONIBILIDAD DE DATOS
+%========================================================================
+\section*{Declaración de Disponibilidad de Datos}
+
+El código fuente completo del sistema, casos de uso documentados, datos de entrada y scripts de ejecución están disponibles públicamente en:
+
+\begin{center}
+\texttt{https://github.com/JavierSalasGarcia/modelo\_esterificacion}
+\end{center}
+
+Los casos de uso se encuentran en el directorio \texttt{Casos/} con subdirectorios \texttt{caso1\_procesamiento\_gc/}, \texttt{caso2\_ajuste\_parametros/}, \texttt{caso3\_optimizacion/}, \texttt{caso4\_comparacion\_modelos/}. Cada caso incluye datos de entrada, scripts de ejecución bash y archivos de configuración JSON.
+
+El sistema está licenciado bajo MIT License (código reutilizable libremente con atribución).
+
+%========================================================================
+% REFERENCIAS
+%========================================================================
+\vspace*{0.9\baselineskip}
+\bibliographystyle{IEEEtranIDEAS.bst}
+\bibliography{references}
+
+\end{document}

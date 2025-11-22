@@ -1,0 +1,1074 @@
+\documentclass[12pt,a4paper]{article}
+
+% Paquetes
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{left=2.5cm,right=2.5cm,top=3cm,bottom=3cm}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+\usepackage{booktabs}
+
+% Configuración de listings para Python
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=8pt,
+    backgroundcolor=\color{gray!10},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+% Configuración de tcolorbox
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{infobox}[1]{
+    colback=blue!5!white,
+    colframe=blue!75!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+\newtcolorbox{examplebox}[1]{
+    colback=green!5!white,
+    colframe=green!75!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=orange!5!white,
+    colframe=orange!75!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+% Headers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Modularidad y Extensibilidad del Sistema}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Título
+\title{
+    \vspace{-2cm}
+    \textbf{Modularidad y Extensibilidad}\\
+    \Large{del Sistema de Modelado de Esterificación}\\
+    \large{Guía para Desarrolladores e Investigadores}\\
+    \vspace{1cm}
+}
+\author{Sistema de Modelado Cinético\\Versión 1.0}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+Este documento describe la arquitectura modular del sistema de modelado de esterificación, proporcionando una guía detallada para investigadores que deseen extender el sistema con nuevos modelos cinéticos, ecuaciones de propiedades, algoritmos de optimización o métodos de análisis. Se presentan ejemplos concretos de cómo modificar y extender cada componente del sistema de manera sistemática y manteniendo la compatibilidad.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Introducción}
+%==============================================================================
+
+\subsection{¿Qué significa que el sistema sea modular?}
+
+Un sistema modular es aquel diseñado en **componentes independientes** que:
+
+\begin{enumerate}
+    \item \textbf{Tienen responsabilidades claramente definidas}
+    \item \textbf{Se comunican mediante interfaces bien especificadas}
+    \item \textbf{Pueden modificarse sin afectar otros módulos}
+    \item \textbf{Pueden reemplazarse por implementaciones alternativas}
+\end{enumerate}
+
+\subsection{Ventajas de la Arquitectura Modular}
+
+\begin{itemize}
+    \item \textbf{Mantenibilidad}: Errores localizados en módulos específicos
+    \item \textbf{Extensibilidad}: Agregar funcionalidades sin romper código existente
+    \item \textbf{Reutilización}: Módulos pueden usarse en otros proyectos
+    \item \textbf{Testing}: Cada módulo puede probarse independientemente
+    \item \textbf{Colaboración}: Múltiples desarrolladores pueden trabajar en paralelo
+    \item \textbf{Documentación**: Más fácil de documentar y entender
+\end{itemize}
+
+\subsection{Objetivo de este Documento}
+
+Proporcionar una guía práctica para que investigadores puedan:
+
+\begin{enumerate}
+    \item Entender la arquitectura del sistema
+    \item Identificar qué módulos modificar para sus necesidades
+    \item Implementar nuevos modelos cinéticos
+    \item Agregar nuevas ecuaciones termodinámicas
+    \item Incorporar algoritmos de optimización avanzados
+    \item Extender capacidades de análisis de datos
+\end{enumerate}
+
+%==============================================================================
+\section{Arquitectura del Sistema}
+%==============================================================================
+
+\subsection{Vista General}
+
+El sistema está organizado en **13 módulos** agrupados en **6 categorías**:
+
+\begin{table}[H]
+\centering
+\caption{Módulos del sistema por categoría}
+\begin{tabular}{llr}
+\toprule
+\textbf{Categoría} & \textbf{Módulos} & \textbf{LOC} \\
+\midrule
+Procesamiento de datos & gc\_processor, data\_loader & 600 \\
+Modelos cinéticos & kinetic\_model, properties, parameter\_fitting & 1800 \\
+Optimización & optimizer & 500 \\
+Comparación y análisis & comparison & 400 \\
+Visualización y exportación & plotter, exporter & 320 \\
+\midrule
+\textbf{TOTAL} & \textbf{11 módulos} & \textbf{5450+} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Diagrama de Dependencias}
+
+\begin{verbatim}
+main.py
+  ├── data_processing/
+  │   ├── gc_processor.py
+  │   └── data_loader.py
+  │
+  ├── models/
+  │   ├── kinetic_model.py  ←─── NÚCLEO MODIFICABLE
+  │   ├── properties.py     ←─── NÚCLEO MODIFICABLE
+  │   └── parameter_fitting.py
+  │
+  ├── optimization/
+  │   └── optimizer.py      ←─── EXTENSIBLE
+  │
+  ├── utils/
+  │   └── comparison.py
+  │
+  └── visualization/
+      ├── plotter.py
+      └── exporter.py
+\end{verbatim}
+
+\subsection{Módulos Clave para Extensión}
+
+Los módulos más frecuentemente modificados para investigación son:
+
+\begin{enumerate}
+    \item \texttt{kinetic\_model.py} - Modelos cinéticos (1-step, 3-step, personalizados)
+    \item \texttt{properties.py} - Propiedades termodinámicas y parámetros
+    \item \texttt{optimizer.py} - Algoritmos de optimización
+    \item \texttt{parameter\_fitting.py} - Métodos de ajuste de parámetros
+\end{enumerate}
+
+%==============================================================================
+\section{Modularidad del Modelo Cinético}
+%==============================================================================
+
+\subsection{Arquitectura de kinetic\_model.py}
+
+\subsubsection{Diseño Actual}
+
+El módulo \texttt{kinetic\_model.py} implementa una clase \texttt{KineticModel} que:
+
+\begin{enumerate}
+    \item Soporta múltiples tipos de modelos (\texttt{model\_type})
+    \item Permite reacciones reversibles o irreversibles
+    \item Integra ODEs usando \texttt{scipy.solve\_ivp}
+    \item Calcula conversión, rendimiento y selectividad
+\end{enumerate}
+
+\subsubsection{Estructura de la Clase}
+
+\begin{lstlisting}[style=pythonstyle, caption=Estructura simplificada de KineticModel]
+class KineticModel:
+    def __init__(self, model_type='1-step', reversible=True, temperature=65.0):
+        self.model_type = model_type
+        self.reversible = reversible
+        self.T = temperature + 273.15  # K
+
+        # Parámetros cinéticos (valores por defecto)
+        self.k = self._calculate_rate_constants()
+
+    def _calculate_rate_constants(self):
+        """Calcula k(T) usando Arrhenius"""
+        # Implementación actual...
+        pass
+
+    def _odes_1step(self, t, y):
+        """ODEs para modelo de 1 paso"""
+        # Implementación actual...
+        pass
+
+    def _odes_3step(self, t, y):
+        """ODEs para modelo de 3 pasos"""
+        # Implementación actual...
+        pass
+
+    def simulate(self, t_span, C0, method='Radau'):
+        """Simula la cinética en el tiempo"""
+        # Selector de modelo
+        if self.model_type == '1-step':
+            ode_func = self._odes_1step
+        elif self.model_type == '3-step':
+            ode_func = self._odes_3step
+        else:
+            raise ValueError(f"Modelo {self.model_type} no implementado")
+
+        # Integración
+        solution = solve_ivp(ode_func, t_span, y0, method=method, ...)
+        return results
+\end{lstlisting}
+
+\subsection{¿Dónde Modificar para Nuevos Modelos?}
+
+\subsubsection{Caso 1: Agregar un Nuevo Modelo Cinético}
+
+\textbf{Objetivo}: Implementar modelo de Langmuir-Hinshelwood
+
+\textbf{Pasos}:
+
+\begin{enumerate}
+    \item \textbf{Agregar método de ODEs}:
+
+\begin{lstlisting}[style=pythonstyle, caption=Nuevo modelo Langmuir-Hinshelwood]
+def _odes_langmuir_hinshelwood(self, t, y):
+    """
+    Modelo Langmuir-Hinshelwood para transesterificación heterogénea
+
+    Ecuación de tasa:
+    r = (k * K_TG * K_MeOH * C_TG * C_MeOH) /
+        ((1 + K_TG * C_TG + K_MeOH * C_MeOH)**2)
+
+    donde:
+    - k: Constante de velocidad (min^-1)
+    - K_TG, K_MeOH: Constantes de adsorción (L/mol)
+    """
+    C_TG, C_MeOH, C_FAME, C_GL = y
+
+    # Constantes de adsorción (parámetros ajustables)
+    K_TG = self.params.get('K_TG', 1.5)    # L/mol
+    K_MeOH = self.params.get('K_MeOH', 0.8)  # L/mol
+
+    # Denominador (término de adsorción)
+    denom = (1 + K_TG * C_TG + K_MeOH * C_MeOH)**2
+
+    # Tasa de reacción
+    r_forward = (self.k['forward'] * K_TG * K_MeOH * C_TG * C_MeOH) / denom
+
+    # Balance de especies
+    dC_TG_dt = -r_forward
+    dC_MeOH_dt = -3 * r_forward
+    dC_FAME_dt = 3 * r_forward
+    dC_GL_dt = r_forward
+
+    return np.array([dC_TG_dt, dC_MeOH_dt, dC_FAME_dt, dC_GL_dt])
+\end{lstlisting}
+
+    \item \textbf{Agregar selector en simulate()}:
+
+\begin{lstlisting}[style=pythonstyle]
+def simulate(self, t_span, C0, method='Radau'):
+    # ... código existente ...
+
+    if self.model_type == '1-step':
+        ode_func = self._odes_1step
+    elif self.model_type == '3-step':
+        ode_func = self._odes_3step
+    elif self.model_type == 'langmuir-hinshelwood':  # NUEVO
+        ode_func = self._odes_langmuir_hinshelwood
+    else:
+        raise ValueError(f"Modelo {self.model_type} no implementado")
+
+    # ... resto del código ...
+\end{lstlisting}
+
+    \item \textbf{Actualizar inicialización de parámetros}:
+
+\begin{lstlisting}[style=pythonstyle]
+def __init__(self, model_type='1-step', reversible=True, temperature=65.0, **params):
+    # ... código existente ...
+    self.params = params  # Parámetros adicionales (K_TG, K_MeOH, etc.)
+    # ... código existente ...
+\end{lstlisting}
+
+    \item \textbf{Usar el nuevo modelo}:
+
+\begin{lstlisting}[style=pythonstyle]
+# Crear modelo Langmuir-Hinshelwood
+model = KineticModel(
+    model_type='langmuir-hinshelwood',
+    temperature=65.0,
+    K_TG=1.5,      # Constante de adsorción TG
+    K_MeOH=0.8     # Constante de adsorción MeOH
+)
+
+# Simular normalmente
+results = model.simulate(t_span=(0, 120), C0=C0)
+\end{lstlisting}
+\end{enumerate}
+
+\subsubsection{Caso 2: Modificar Ecuación de Arrhenius}
+
+\textbf{Objetivo}: Usar ecuación de Eyring en lugar de Arrhenius
+
+\textbf{Ecuación de Eyring}:
+\begin{equation}
+k(T) = \frac{k_B T}{h} \exp\left(\frac{\Delta S^‡}{R}\right) \exp\left(-\frac{\Delta H^‡}{RT}\right)
+\end{equation}
+
+\textbf{Modificación en \_calculate\_rate\_constants()}:
+
+\begin{lstlisting}[style=pythonstyle, caption=Ecuación de Eyring]
+def _calculate_rate_constants(self):
+    """Calcula constantes usando ecuación de Eyring"""
+    from scipy.constants import Boltzmann, Planck
+
+    # Parámetros termodinámicos de activación
+    Delta_S_forward = self.params.get('Delta_S_forward', 50.0)  # J/(mol·K)
+    Delta_H_forward = self.params.get('Delta_H_forward', 51900.0)  # J/mol
+
+    # Constante de velocidad (Eyring)
+    k_forward = (Boltzmann * self.T / Planck) * \
+                np.exp(Delta_S_forward / 8.314) * \
+                np.exp(-Delta_H_forward / (8.314 * self.T))
+
+    return {'forward': k_forward}
+\end{lstlisting}
+
+\subsubsection{Caso 3: Modelo con Inhibición por Productos}
+
+\textbf{Objetivo}: Incluir inhibición competitiva por glicerol
+
+\textbf{Ecuación}:
+\begin{equation}
+r = \frac{k \cdot C_{TG} \cdot C_{MeOH}}{1 + K_I \cdot C_{GL}}
+\end{equation}
+
+\begin{lstlisting}[style=pythonstyle, caption=Modelo con inhibición]
+def _odes_with_inhibition(self, t, y):
+    """Modelo con inhibición por glicerol"""
+    C_TG, C_MeOH, C_FAME, C_GL = y
+
+    # Constante de inhibición (ajustable)
+    K_I = self.params.get('K_I', 2.0)  # L/mol
+
+    # Tasa con inhibición
+    r_forward = (self.k['forward'] * C_TG * C_MeOH) / (1 + K_I * C_GL)
+
+    # Balances
+    dC_TG_dt = -r_forward
+    dC_MeOH_dt = -3 * r_forward
+    dC_FAME_dt = 3 * r_forward
+    dC_GL_dt = r_forward
+
+    return np.array([dC_TG_dt, dC_MeOH_dt, dC_FAME_dt, dC_GL_dt])
+\end{lstlisting}
+
+\subsection{Checklist para Agregar Nuevo Modelo}
+
+\begin{enumerate}
+    \item[$\square$] Definir ecuaciones cinéticas (tasa de reacción)
+    \item[$\square$] Identificar parámetros ajustables (k, K, órdenes de reacción, etc.)
+    \item[$\square$] Implementar método \texttt{\_odes\_NOMBRE()}
+    \item[$\square$] Agregar selector en \texttt{simulate()}
+    \item[$\square$] Documentar modelo (docstring con ecuaciones)
+    \item[$\square$] Crear test unitario
+    \item[$\square$] Validar con datos experimentales
+    \item[$\square$] Comparar con modelo de 1 paso (baseline)
+\end{enumerate}
+
+%==============================================================================
+\section{Modularidad de Propiedades Termodinámicas}
+%==============================================================================
+
+\subsection{Arquitectura de properties.py}
+
+El módulo \texttt{properties.py} contiene:
+
+\begin{enumerate}
+    \item Propiedades físicas de componentes puros
+    \item Reglas de mezcla
+    \item Parámetros cinéticos de literatura
+    \item Correlaciones de propiedades de transporte
+\end{enumerate}
+
+\subsection{¿Dónde Modificar para Nuevas Propiedades?}
+
+\subsubsection{Caso 1: Agregar Nuevo Componente}
+
+\textbf{Objetivo}: Incluir propiedades de trioleína (otro triglicérido)
+
+\begin{lstlisting}[style=pythonstyle, caption=Agregar trioleína]
+# En properties.py, sección de componentes
+
+COMPONENTS = {
+    # ... componentes existentes ...
+
+    'Trioleina': {
+        'formula': 'C57H104O6',
+        'MW': 885.43,  # g/mol
+        'Tb': 235.0,   # °C a 1 mmHg
+        'Tc': 805.0,   # K (estimado)
+        'Pc': 0.4,     # MPa (estimado)
+        'omega': 1.2,  # Factor acéntrico
+
+        # Propiedades a 25°C
+        'rho_25C': 910.0,    # kg/m³
+        'mu_25C': 0.035,     # Pa·s
+        'Cp_25C': 2100.0,    # J/(kg·K)
+        'k_25C': 0.17,       # W/(m·K)
+
+        # Correlaciones de densidad
+        'rho_coeff': {
+            'A': 1150.0,
+            'B': -0.65,      # kg/m³·K
+            'Tref': 298.15   # K
+        },
+
+        # Fuente de datos
+        'reference': 'Perry Handbook, 9th ed., Table 2-165'
+    }
+}
+\end{lstlisting}
+
+\textbf{Uso}:
+
+\begin{lstlisting}[style=pythonstyle]
+from src.models.properties import COMPONENTS
+
+# Obtener propiedades
+MW_trioleina = COMPONENTS['Trioleina']['MW']
+rho_trioleina = COMPONENTS['Trioleina']['rho_25C']
+\end{lstlisting}
+
+\subsubsection{Caso 2: Implementar Nueva Correlación de Viscosidad}
+
+\textbf{Objetivo}: Usar correlación de Andrade en lugar de lineal
+
+\textbf{Ecuación de Andrade}:
+\begin{equation}
+\mu(T) = A \cdot \exp\left(\frac{B}{T}\right)
+\end{equation}
+
+\begin{lstlisting}[style=pythonstyle, caption=Correlación de Andrade]
+def viscosity_andrade(T, A, B):
+    """
+    Calcula viscosidad usando ecuación de Andrade
+
+    Parámetros:
+    -----------
+    T : float
+        Temperatura (K)
+    A : float
+        Parámetro A (Pa·s)
+    B : float
+        Parámetro B (K)
+
+    Returns:
+    --------
+    mu : float
+        Viscosidad (Pa·s)
+
+    Ejemplo:
+    --------
+    >>> mu = viscosity_andrade(T=338.15, A=0.001, B=1500.0)
+    >>> print(f"Viscosidad: {mu:.5f} Pa·s")
+    """
+    return A * np.exp(B / T)
+
+# Agregar a clase ThermodynamicProperties
+class ThermodynamicProperties:
+    # ... métodos existentes ...
+
+    def get_viscosity(self, component, T, method='andrade'):
+        """Obtiene viscosidad con método seleccionable"""
+        if method == 'andrade':
+            params = COMPONENTS[component]['mu_andrade']
+            return viscosity_andrade(T, params['A'], params['B'])
+        elif method == 'linear':
+            # Método existente...
+            pass
+        else:
+            raise ValueError(f"Método {method} no reconocido")
+\end{lstlisting}
+
+\subsubsection{Caso 3: Reglas de Mezcla Avanzadas}
+
+\textbf{Objetivo}: Implementar regla de mezcla de Redlich-Kister
+
+\begin{lstlisting}[style=pythonstyle, caption=Regla de Redlich-Kister]
+def mixing_rule_redlich_kister(x, properties, interaction_params):
+    """
+    Regla de mezcla de Redlich-Kister para exceso de Gibbs
+
+    G^E / RT = x1 * x2 * sum(A_k * (x1 - x2)^k)
+
+    Parámetros:
+    -----------
+    x : dict
+        Fracciones molares {'comp1': 0.3, 'comp2': 0.7}
+    properties : dict
+        Propiedades de componentes puros
+    interaction_params : dict
+        Parámetros de interacción binaria A0, A1, A2, ...
+
+    Returns:
+    --------
+    prop_mixture : float
+        Propiedad de la mezcla
+    """
+    # Implementación de Redlich-Kister
+    # ...
+    pass
+\end{lstlisting}
+
+\subsection{Extensión con Bases de Datos Externas}
+
+\subsubsection{Integración con DIPPR}
+
+\begin{lstlisting}[style=pythonstyle, caption=Usar base de datos DIPPR]
+import pandas as pd
+
+def load_dippr_database(file_path='data/DIPPR_database.csv'):
+    """Carga base de datos DIPPR de propiedades"""
+    dippr = pd.read_csv(file_path)
+    return dippr
+
+def get_property_from_dippr(compound_name, property_name, T):
+    """
+    Obtiene propiedad de DIPPR con correlaciones de temperatura
+
+    Parámetros:
+    -----------
+    compound_name : str
+        Nombre del compuesto (ej. 'Methanol')
+    property_name : str
+        Propiedad (ej. 'Density', 'Viscosity')
+    T : float
+        Temperatura (K)
+
+    Returns:
+    --------
+    value : float
+        Valor de la propiedad a temperatura T
+    """
+    dippr_db = load_dippr_database()
+    comp_data = dippr_db[dippr_db['Name'] == compound_name].iloc[0]
+
+    # Ecuación DIPPR (típicamente: prop = A + B*T + C*T^2 + D*T^3 + E*T^4)
+    A = comp_data[f'{property_name}_A']
+    B = comp_data[f'{property_name}_B']
+    C = comp_data[f'{property_name}_C']
+    D = comp_data[f'{property_name}_D']
+    E = comp_data[f'{property_name}_E']
+
+    value = A + B*T + C*T**2 + D*T**3 + E*T**4
+
+    return value
+\end{lstlisting}
+
+%==============================================================================
+\section{Modularidad de Optimización}
+%==============================================================================
+
+\subsection{Arquitectura de optimizer.py}
+
+El módulo de optimización permite:
+
+\begin{enumerate}
+    \item Optimizar múltiples variables (T, RPM, \% catalizador)
+    \item Usar diferentes algoritmos (DE, SLSQP, Dual Annealing)
+    \item Definir funciones objetivo personalizadas
+    \item Restricciones lineales y no lineales
+\end{enumerate}
+
+\subsection{¿Dónde Modificar para Nuevos Algoritmos?}
+
+\subsubsection{Caso 1: Agregar Optimización Bayesiana}
+
+\begin{lstlisting}[style=pythonstyle, caption=Optimización bayesiana con scikit-optimize]
+from skopt import gp_minimize
+from skopt.space import Real
+
+def optimize_bayesian(self, C0, t_reaction=120, n_calls=50):
+    """
+    Optimización bayesiana usando Gaussian Processes
+
+    Parámetros:
+    -----------
+    C0 : dict
+        Concentraciones iniciales
+    t_reaction : float
+        Tiempo de reacción (min)
+    n_calls : int
+        Número de evaluaciones del objetivo
+
+    Returns:
+    --------
+    result : dict
+        Condiciones óptimas y conversión
+    """
+    # Definir espacio de búsqueda
+    space = [
+        Real(50.0, 80.0, name='temperature'),      # °C
+        Real(200.0, 800.0, name='rpm'),            # rpm
+        Real(1.0, 5.0, name='catalyst_percent')    # %
+    ]
+
+    # Función objetivo (wrapper)
+    def objective(params):
+        T, rpm, cat = params
+        conversion = self._evaluate_conversion(T, rpm, cat, C0, t_reaction)
+        return -conversion  # Minimizar negativo = maximizar
+
+    # Ejecutar optimización bayesiana
+    result = gp_minimize(objective, space, n_calls=n_calls, random_state=42)
+
+    # Extraer resultados
+    optimal_conditions = {
+        'temperature': result.x[0],
+        'rpm': result.x[1],
+        'catalyst_%': result.x[2],
+        'conversion_%': -result.fun,  # Revertir signo
+        'n_evaluations': len(result.func_vals)
+    }
+
+    return optimal_conditions
+\end{lstlisting}
+
+\subsubsection{Caso 2: Optimización Multi-Objetivo (Pareto)}
+
+\textbf{Objetivo}: Maximizar conversión Y minimizar uso de catalizador
+
+\begin{lstlisting}[style=pythonstyle, caption=Optimización multi-objetivo con NSGA-II]
+from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.core.problem import Problem
+from pymoo.optimize import minimize
+
+class BiodieselMultiObjective(Problem):
+    """Problema de optimización multi-objetivo para biodiésel"""
+
+    def __init__(self, kinetic_model, C0, t_reaction):
+        super().__init__(
+            n_var=3,           # T, RPM, %cat
+            n_obj=2,           # 2 objetivos
+            n_constr=0,        # Sin restricciones
+            xl=[50, 200, 1],   # Límites inferiores
+            xu=[80, 800, 5]    # Límites superiores
+        )
+        self.model = kinetic_model
+        self.C0 = C0
+        self.t_reaction = t_reaction
+
+    def _evaluate(self, X, out, *args, **kwargs):
+        """Evaluar objetivos"""
+        f1 = []  # Objetivo 1: Minimizar -conversión (maximizar conversión)
+        f2 = []  # Objetivo 2: Minimizar uso de catalizador
+
+        for x in X:
+            T, rpm, cat_percent = x
+
+            # Simular con estas condiciones
+            conversion = self._simulate(T, rpm, cat_percent)
+
+            f1.append(-conversion)      # Minimizar negativo
+            f2.append(cat_percent)      # Minimizar catalizador
+
+        out["F"] = np.column_stack([f1, f2])
+
+def optimize_pareto(self, C0, t_reaction=120, n_gen=50):
+    """Optimización multi-objetivo con NSGA-II"""
+
+    # Definir problema
+    problem = BiodieselMultiObjective(self.model, C0, t_reaction)
+
+    # Algoritmo NSGA-II
+    algorithm = NSGA2(pop_size=50)
+
+    # Ejecutar optimización
+    result = minimize(
+        problem,
+        algorithm,
+        ('n_gen', n_gen),
+        verbose=True
+    )
+
+    # Frente de Pareto
+    pareto_front = {
+        'conversion_%': -result.F[:, 0],  # Revertir
+        'catalyst_%': result.F[:, 1],
+        'temperature': result.X[:, 0],
+        'rpm': result.X[:, 1]
+    }
+
+    return pareto_front
+\end{lstlisting}
+
+\subsubsection{Caso 3: Optimización Robusta (bajo Incertidumbre)}
+
+\begin{lstlisting}[style=pythonstyle, caption=Optimización robusta con Monte Carlo]
+def optimize_robust(self, C0, t_reaction=120, n_samples=100):
+    """
+    Optimización robusta considerando incertidumbre en parámetros
+
+    Objetivo: Maximizar conversión esperada bajo incertidumbre de parámetros cinéticos
+
+    Parámetros:
+    -----------
+    C0 : dict
+        Concentraciones iniciales
+    t_reaction : float
+        Tiempo de reacción
+    n_samples : int
+        Número de muestras Monte Carlo para cada evaluación
+
+    Returns:
+    --------
+    robust_optimum : dict
+        Condiciones óptimas robustas
+    """
+    from scipy.optimize import differential_evolution
+
+    def robust_objective(params):
+        """Objetivo: media - 2*std (robustez)"""
+        T, rpm, cat = params
+
+        conversions = []
+        # Muestreo Monte Carlo de parámetros cinéticos
+        for _ in range(n_samples):
+            # Perturbación de Ea (± 10%)
+            Ea_sample = np.random.normal(self.Ea, 0.1 * self.Ea)
+
+            # Perturbación de A (± 20%)
+            A_sample = np.random.lognormal(np.log(self.A), 0.2)
+
+            # Simular con parámetros perturbados
+            conversion = self._evaluate_with_params(
+                T, rpm, cat, C0, t_reaction,
+                A=A_sample, Ea=Ea_sample
+            )
+            conversions.append(conversion)
+
+        # Métrica robusta: media - 2*desviación estándar
+        mean_conv = np.mean(conversions)
+        std_conv = np.std(conversions)
+        robust_metric = mean_conv - 2 * std_conv
+
+        return -robust_metric  # Minimizar negativo
+
+    # Optimizar
+    bounds = [(50, 80), (200, 800), (1, 5)]
+    result = differential_evolution(robust_objective, bounds)
+
+    return {
+        'temperature': result.x[0],
+        'rpm': result.x[1],
+        'catalyst_%': result.x[2],
+        'robust_conversion_%': -result.fun
+    }
+\end{lstlisting}
+
+%==============================================================================
+\section{Modularidad de Ajuste de Parámetros}
+%==============================================================================
+
+\subsection{¿Dónde Modificar para Nuevos Métodos?}
+
+\subsubsection{Caso 1: Regresión Simbólica con SymPy}
+
+\textbf{Objetivo}: Descubrir forma funcional de k(T) automáticamente
+
+\begin{lstlisting}[style=pythonstyle, caption=Regresión simbólica]
+from gplearn.genetic import SymbolicRegressor
+
+def symbolic_regression_kinetics(self, T_data, k_data):
+    """
+    Regresión simbólica para descubrir ecuación k(T)
+
+    Parámetros:
+    -----------
+    T_data : array
+        Temperaturas experimentales (K)
+    k_data : array
+        Constantes de velocidad medidas (min^-1)
+
+    Returns:
+    --------
+    best_equation : str
+        Ecuación simbólica descubierta
+    """
+    # Configurar regresión simbólica
+    est_gp = SymbolicRegressor(
+        population_size=5000,
+        generations=20,
+        function_set=('add', 'sub', 'mul', 'div', 'log', 'exp'),
+        metric='mean absolute error',
+        parsimony_coefficient=0.01,
+        random_state=42
+    )
+
+    # Ajustar
+    X = T_data.reshape(-1, 1)
+    y = k_data
+    est_gp.fit(X, y)
+
+    # Mejor ecuación
+    best_equation = str(est_gp._program)
+
+    print(f"Ecuación descubierta: k(T) = {best_equation}")
+    print(f"R²: {est_gp.score(X, y):.4f}")
+
+    return best_equation, est_gp
+\end{lstlisting}
+
+\subsubsection{Caso 2: Ajuste Bayesiano con PyMC}
+
+\begin{lstlisting}[style=pythonstyle, caption=Inferencia bayesiana de parámetros]
+import pymc as pm
+
+def bayesian_parameter_estimation(self, t_exp, conversion_exp, C0):
+    """
+    Estimación bayesiana de parámetros cinéticos
+
+    Ventajas:
+    - Intervalos de credibilidad naturales
+    - Incorporación de conocimiento previo (priors)
+    - Cuantificación de incertidumbre completa
+    """
+    with pm.Model() as model:
+        # Priors (basados en literatura)
+        A = pm.Lognormal('A', mu=np.log(1e10), sigma=1.0)  # min^-1
+        Ea = pm.Normal('Ea', mu=55.0, sigma=10.0)          # kJ/mol
+
+        # Sigma de error observacional
+        sigma = pm.HalfNormal('sigma', sigma=2.0)
+
+        # Modelo cinético (simulación dentro de PyMC)
+        conversion_pred = self._simulate_pymc(t_exp, C0, A, Ea)
+
+        # Likelihood
+        likelihood = pm.Normal(
+            'conversion',
+            mu=conversion_pred,
+            sigma=sigma,
+            observed=conversion_exp
+        )
+
+        # Muestreo MCMC
+        trace = pm.sample(2000, tune=1000, return_inferencedata=True)
+
+    # Resultados
+    summary = pm.summary(trace, var_names=['A', 'Ea'])
+    print(summary)
+
+    return trace
+\end{lstlisting}
+
+%==============================================================================
+\section{Guía de Buenas Prácticas}
+%==============================================================================
+
+\subsection{Principios de Diseño Modular}
+
+\begin{enumerate}
+    \item \textbf{Una responsabilidad por módulo}: Cada módulo debe hacer una sola cosa
+
+    \item \textbf{Interfaces claras}: Documentar inputs y outputs de funciones
+
+    \item \textbf{Bajo acoplamiento}: Minimizar dependencias entre módulos
+
+    \item \textbf{Alta cohesión}: Funciones relacionadas en el mismo módulo
+
+    \item \textbf{Documentación}:usar docstrings con ejemplos
+
+    \item \textbf{Tests unitarios}: Cada módulo debe tener tests
+
+    \item \textbf{Versionado}: Usar Git para control de cambios
+\end{enumerate}
+
+\subsection{Checklist para Extender el Sistema}
+
+\begin{enumerate}
+    \item[$\square$] Identificar qué módulo modificar
+    \item[$\square$] Leer documentación del módulo (docstrings)
+    \item[$\square$] Crear branch de Git para tu modificación
+    \item[$\square$] Implementar cambio manteniendo compatibilidad
+    \item[$\square$] Agregar docstring con ecuaciones y referencias
+    \item[$\square$] Crear test unitario
+    \item[$\square$] Validar con datos experimentales
+    \item[$\square$] Actualizar documentación general
+    \item[$\square$] Commit con mensaje descriptivo
+    \item[$\square$] Opcional: Pull request para integrar en main
+\end{enumerate}
+
+\subsection{Plantilla para Nuevo Modelo}
+
+\begin{lstlisting}[style=pythonstyle, caption=Plantilla genérica]
+def _odes_NOMBRE_MODELO(self, t, y):
+    """
+    Descripción del modelo cinético
+
+    Ecuaciones:
+    -----------
+    r = ... (ecuación matemática en LaTeX o texto)
+
+    Parámetros requeridos:
+    ----------------------
+    - param1 : descripción
+    - param2 : descripción
+
+    Referencias:
+    ------------
+    Autor et al. (Año). Título. Journal, vol(num), páginas.
+
+    Ejemplo:
+    --------
+    >>> model = KineticModel(model_type='NOMBRE_MODELO', param1=1.5)
+    >>> results = model.simulate(t_span=(0, 120), C0=C0)
+    """
+    # Extraer concentraciones
+    C_TG, C_MeOH, C_FAME, C_GL = y
+
+    # Obtener parámetros
+    param1 = self.params.get('param1', valor_default)
+    param2 = self.params.get('param2', valor_default)
+
+    # Calcular tasa de reacción
+    r = ...  # Tu ecuación aquí
+
+    # Balances de especies
+    dC_TG_dt = ...
+    dC_MeOH_dt = ...
+    dC_FAME_dt = ...
+    dC_GL_dt = ...
+
+    return np.array([dC_TG_dt, dC_MeOH_dt, dC_FAME_dt, dC_GL_dt])
+\end{lstlisting}
+
+%==============================================================================
+\section{Casos de Estudio}
+%==============================================================================
+
+\subsection{Caso 1: Implementar Modelo de Eley-Rideal}
+
+\textbf{Contexto}: Reacción heterogénea donde MeOH se adsorbe pero TG reacciona desde fase líquida.
+
+\textbf{Ecuación}:
+\begin{equation}
+r = \frac{k \cdot K_{MeOH} \cdot C_{TG} \cdot C_{MeOH}}{1 + K_{MeOH} \cdot C_{MeOH}}
+\end{equation}
+
+\textbf{Implementación completa en Anexo A.1}
+
+\subsection{Caso 2: Modelo con Desactivación de Catalizador}
+
+\textbf{Contexto}: El catalizador CaO pierde actividad por formación de jabones.
+
+\textbf{Ecuación}:
+\begin{equation}
+\frac{da}{dt} = -k_d \cdot a^n
+\end{equation}
+donde $a$ es actividad del catalizador.
+
+\textbf{Implementación completa en Anexo A.2}
+
+\subsection{Caso 3: Integrar Base de Datos de Biodiesel}
+
+\textbf{Contexto}: Usar base de datos de propiedades de FAMEs según tipo de aceite.
+
+\textbf{Implementación completa en Anexo A.3}
+
+%==============================================================================
+\section{Conclusiones}
+%==============================================================================
+
+\subsection{Resumen}
+
+El sistema de modelado de esterificación ha sido diseñado como:
+
+\begin{itemize}
+    \item \textbf{Modular}: 13 módulos independientes con responsabilidades claras
+    \item \textbf{Extensible}: Fácil agregar nuevos modelos, algoritmos y propiedades
+    \item \textbf{Mantenible}: Código bien documentado y estructurado
+    \item \textbf{Flexible}: Múltiples puntos de extensión identificados
+\end{itemize}
+
+\subsection{Módulos Clave para Investigación}
+
+\begin{table}[H]
+\centering
+\caption{Frecuencia de modificación por tipo de investigación}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Módulo} & \textbf{Cinética} & \textbf{Termo} & \textbf{Optim} & \textbf{ML} \\
+\midrule
+kinetic\_model.py & ★★★ & ★ & ★ & ★★ \\
+properties.py & ★ & ★★★ & ★ & ★ \\
+optimizer.py & ★ & ★ & ★★★ & ★★ \\
+parameter\_fitting.py & ★★ & ★ & ★★ & ★★★ \\
+\bottomrule
+\end{tabular}
+\end{table}
+★★★ = Muy frecuente, ★★ = Frecuente, ★ = Ocasional
+
+\subsection{Mensaje Final}
+
+\begin{infobox}{Para Investigadores}
+Este sistema está diseñado para \textbf{evolucionar con tu investigación}:
+
+\begin{itemize}
+    \item No es una "caja negra" - todo es modificable
+    \item Cada extensión mantiene compatibilidad con lo existente
+    \item Puedes compartir tus extensiones con la comunidad
+    \item La arquitectura modular facilita publicaciones reproducibles
+\end{itemize}
+
+\textbf{Tu investigación puede contribuir} agregando:
+\begin{itemize}
+    \item Nuevos modelos cinéticos validados
+    \item Correlaciones termodinámicas mejoradas
+    \item Algoritmos de optimización avanzados
+    \item Métodos de análisis de datos innovadores
+\end{itemize}
+
+\textbf{¡El sistema crece con cada investigador que lo usa!}
+\end{infobox}
+
+\end{document}

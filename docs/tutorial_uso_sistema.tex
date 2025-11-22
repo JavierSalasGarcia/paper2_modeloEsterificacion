@@ -1,0 +1,1277 @@
+\documentclass[12pt,a4paper]{article}
+
+% Paquetes
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{left=2.5cm,right=2.5cm,top=3cm,bottom=3cm}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+
+% Configuración de listings para Python
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=8pt,
+    backgroundcolor=\color{gray!10},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+\lstdefinestyle{bashstyle}{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    breaklines=true
+}
+
+% Configuración de tcolorbox
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{infobox}[1]{
+    colback=blue!5!white,
+    colframe=blue!75!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=orange!5!white,
+    colframe=orange!75!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+\newtcolorbox{successbox}[1]{
+    colback=green!5!white,
+    colframe=green!75!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+% Configuración de headers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Tutorial del Sistema de Modelado de Esterificación}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Información del documento
+\title{
+    \vspace{-2cm}
+    \textbf{Tutorial Paso a Paso}\\
+    \Large{Sistema Integrado de Modelado de Esterificación\\
+    para Producción de Biodiésel}\\
+    \vspace{1cm}
+    \includegraphics[width=0.3\textwidth]{logo.png}\\
+    \vspace{1cm}
+}
+\author{Sistema de Modelado Cinético\\
+        Versión 1.0}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\newpage
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Introducción}
+%==============================================================================
+
+\subsection{Propósito de este Tutorial}
+
+Este tutorial proporciona una guía completa paso a paso para utilizar el \textbf{Sistema Integrado de Modelado de Esterificación} para la producción de biodiésel mediante transesterificación catalizada por CaO. Está diseñado para que usuarios sin experiencia previa puedan:
+
+\begin{itemize}
+    \item Preparar sus datos experimentales en el formato correcto
+    \item Ejecutar todos los módulos del sistema
+    \item Interpretar los resultados obtenidos
+    \item Generar reportes y gráficas publication-ready
+\end{itemize}
+
+\subsection{Características del Sistema}
+
+El sistema incluye \textbf{13 módulos} (más de 6500 líneas de código) que cubren:
+
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Procesamiento de datos GC-FID}: Conversión de cromatogramas a concentraciones
+    \item \textbf{Modelos cinéticos}: 1 paso (simplificado) o 3 pasos (mecanístico)
+    \item \textbf{Ajuste de parámetros}: Estimación de energía de activación (Ea) y factor pre-exponencial (A)
+    \item \textbf{Optimización}: Búsqueda de condiciones óptimas (T, RPM, \% catalizador)
+    \item \textbf{Análisis comparativo}: Métricas estadísticas entre modelos
+    \item \textbf{Visualización}: Gráficas profesionales y reportes automatizados
+    \item \textbf{Especificaciones CFD}: Diseño completo para reactor 20L (hélice axial, sin baffles, con serpentín)
+\end{enumerate}
+
+\subsection{Requisitos del Sistema}
+
+\begin{infobox}{Requisitos Mínimos}
+\textbf{Software requerido}:
+\begin{itemize}
+    \item Python 3.8 o superior
+    \item pip (gestor de paquetes)
+    \item Editor de texto (VS Code, PyCharm, Spyder, etc.)
+\end{itemize}
+
+\textbf{Software opcional}:
+\begin{itemize}
+    \item Ansys Fluent (para simulación CFD)
+    \item LaTeX (para compilar documentación)
+\end{itemize}
+
+\textbf{Hardware recomendado}:
+\begin{itemize}
+    \item RAM: 4 GB mínimo, 8 GB recomendado
+    \item Almacenamiento: 500 MB libres
+    \item Procesador: Dual-core 2.0 GHz o superior
+\end{itemize}
+\end{infobox}
+
+\subsection{Estructura del Tutorial}
+
+El tutorial sigue un flujo lógico de trabajo:
+
+\begin{enumerate}
+    \item \textbf{Instalación y configuración inicial} (Sección 2)
+    \item \textbf{Preparación de archivos de datos} (Sección 3)
+    \item \textbf{Ejecución de módulos principales} (Sección 4)
+    \item \textbf{Interpretación de resultados} (Sección 5)
+    \item \textbf{Casos de uso avanzados} (Sección 6)
+    \item \textbf{Troubleshooting} (Sección 7)
+\end{enumerate}
+
+%==============================================================================
+\section{Instalación y Configuración Inicial}
+%==============================================================================
+
+\subsection{Paso 1: Clonar el Repositorio}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item Abrir una terminal (Linux/Mac) o Command Prompt (Windows)
+    \item Navegar al directorio donde deseas instalar el sistema
+    \item Ejecutar:
+\end{enumerate}
+
+\begin{lstlisting}[style=bashstyle]
+git clone <repository-url>
+cd mod_esterificacion
+\end{lstlisting}
+
+\begin{warningbox}{¿No tienes Git?}
+Si no tienes Git instalado:
+\begin{itemize}
+    \item \textbf{Windows}: Descargar de \url{https://git-scm.com/download/win}
+    \item \textbf{Linux}: \texttt{sudo apt install git} (Ubuntu/Debian)
+    \item \textbf{Mac}: Viene preinstalado o usar Homebrew: \texttt{brew install git}
+\end{itemize}
+
+Alternativamente, descarga el repositorio como ZIP desde GitHub y descomprímelo.
+\end{warningbox}
+
+\subsection{Paso 2: Crear Entorno Virtual (Recomendado)}
+
+Los entornos virtuales aíslan las dependencias del proyecto.
+
+\subsubsection{En Linux/Mac}
+
+\begin{lstlisting}[style=bashstyle]
+python3 -m venv venv
+source venv/bin/activate
+\end{lstlisting}
+
+\subsubsection{En Windows}
+
+\begin{lstlisting}[style=bashstyle]
+python -m venv venv
+venv\Scripts\activate
+\end{lstlisting}
+
+\begin{infobox}{Verificación}
+Si el entorno virtual está activado, verás \texttt{(venv)} al inicio de la línea de comandos:
+\begin{verbatim}
+(venv) user@computer:~/mod_esterificacion$
+\end{verbatim}
+\end{infobox}
+
+\subsection{Paso 3: Instalar Dependencias}
+
+Con el entorno virtual activado:
+
+\begin{lstlisting}[style=bashstyle]
+pip install --upgrade pip
+pip install -r requirements.txt
+\end{lstlisting}
+
+Este proceso instalará todas las bibliotecas necesarias:
+
+\begin{table}[H]
+\centering
+\caption{Principales dependencias instaladas}
+\begin{tabular}{ll}
+\toprule
+\textbf{Paquete} & \textbf{Propósito} \\
+\midrule
+numpy & Cálculos numéricos \\
+scipy & Integración de ODEs y optimización \\
+pandas & Manipulación de datos \\
+matplotlib & Visualización 2D \\
+plotly & Visualización interactiva 3D \\
+lmfit & Ajuste de parámetros no lineales \\
+openpyxl & Exportación a Excel \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Paso 4: Verificar Instalación}
+
+Ejecutar el siguiente comando para verificar que todos los módulos se importan correctamente:
+
+\begin{lstlisting}[style=pythonstyle]
+python -c "from src.models.kinetic_model import KineticModel; print('OK')"
+\end{lstlisting}
+
+\begin{successbox}{Instalación Exitosa}
+Si ves \texttt{OK} sin errores, la instalación fue exitosa. Estás listo para continuar.
+\end{successbox}
+
+%==============================================================================
+\section{Preparación de Archivos de Datos}
+%==============================================================================
+
+\subsection{Introducción}
+
+El sistema requiere que tus datos experimentales estén en formatos específicos. Esta sección explica cómo preparar:
+
+\begin{itemize}
+    \item Datos de cromatografía GC-FID
+    \item Variables experimentales
+    \item Archivos de configuración
+\end{itemize}
+
+\textbf{Ubicación de plantillas}: La carpeta \texttt{plantillas/} contiene archivos de ejemplo listos para llenar.
+
+\subsection{Opción 1: Datos GC-FID en CSV}
+
+\subsubsection{Formato del Archivo}
+
+Los datos GC-FID deben estar en formato CSV (valores separados por comas) con las siguientes columnas:
+
+\begin{table}[H]
+\centering
+\caption{Columnas requeridas en CSV de datos GC}
+\begin{tabular}{lll}
+\toprule
+\textbf{Columna} & \textbf{Descripción} & \textbf{Unidades} \\
+\midrule
+tiempo\_min & Tiempo de muestreo & minutos \\
+compuesto & Nombre del compuesto & texto \\
+area\_pico & Área del pico cromatográfico & unidades arbitrarias \\
+tiempo\_retencion\_min & Tiempo de retención & minutos \\
+notas & Notas adicionales (opcional) & texto \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Compuestos válidos}:
+\begin{itemize}
+    \item \texttt{TG}: Triglicéridos
+    \item \texttt{DG}: Diglicéridos (opcional)
+    \item \texttt{MG}: Monoglicéridos (opcional)
+    \item \texttt{FAME}: Ésteres metílicos de ácidos grasos
+    \item \texttt{GL}: Glicerol
+    \item \texttt{MeOH}: Metanol
+    \item \texttt{Estándar\_Interno}: Estándar interno para cuantificación
+\end{itemize}
+
+\subsubsection{Ejemplo de Archivo}
+
+\begin{lstlisting}[style=bashstyle, caption=Ejemplo: experimento\_01.csv]
+tiempo_min,compuesto,area_pico,tiempo_retencion_min,notas
+0,TG,15000.0,12.5,Tiempo inicial
+0,MeOH,50000.0,2.1,Tiempo inicial
+0,FAME,0.0,8.3,Tiempo inicial
+0,GL,0.0,14.2,Tiempo inicial
+0,Estándar_Interno,25000.0,10.0,Tiempo inicial
+10,TG,13500.0,12.5,Muestra a 10 minutos
+10,MeOH,48000.0,2.1,Muestra a 10 minutos
+10,FAME,1500.0,8.3,Muestra a 10 minutos
+10,GL,150.0,14.2,Muestra a 10 minutos
+10,Estándar_Interno,25000.0,10.0,Muestra a 10 minutos
+...
+\end{lstlisting}
+
+\subsubsection{Pasos para Crear tu Archivo}
+
+\begin{enumerate}
+    \item Copiar la plantilla:
+    \begin{lstlisting}[style=bashstyle]
+cp plantillas/plantilla_datos_gc.csv data/raw/mi_experimento.csv
+    \end{lstlisting}
+
+    \item Abrir \texttt{data/raw/mi\_experimento.csv} en Excel, LibreOffice Calc o editor de texto
+
+    \item Reemplazar los valores de ejemplo con tus datos reales
+
+    \item \textbf{Importante}: Mantener el formato CSV y los nombres de columnas exactos
+
+    \item Guardar el archivo (asegurarse que sigue siendo .csv, no .xlsx)
+\end{enumerate}
+
+\begin{warningbox}{Errores Comunes}
+\begin{itemize}
+    \item \textbf{Separador incorrecto}: Usar coma (,) no punto y coma (;)
+    \item \textbf{Nombres de compuestos}: Respetar mayúsculas/minúsculas exactas
+    \item \textbf{Formato decimal}: Usar punto (12.5) no coma (12,5)
+    \item \textbf{Estándar interno ausente}: Debe aparecer en TODOS los tiempos de muestreo
+\end{itemize}
+\end{warningbox}
+
+\subsection{Opción 2: Experimento Completo en JSON}
+
+\subsubsection{Ventajas del Formato JSON}
+
+El formato JSON permite especificar todas las variables del experimento en un solo archivo:
+
+\begin{itemize}
+    \item Variables del experimento (temperatura, RPM, etc.)
+    \item Propiedades del aceite y metanol
+    \item Características del catalizador
+    \item Condiciones de operación
+    \item Datos GC-FID integrados
+\end{itemize}
+
+\subsubsection{Estructura del Archivo JSON}
+
+Ver archivo \texttt{plantillas/plantilla\_experimento.json}. Las secciones principales son:
+
+\begin{enumerate}
+    \item \textbf{experimento}: Metadatos (ID, fecha, operador)
+    \item \textbf{reactivos}: Aceite, metanol, relación molar
+    \item \textbf{catalizador}: Tipo (CaO), masa, pureza
+    \item \textbf{condiciones\_reaccion}: T, presión, RPM, tiempo
+    \item \textbf{muestreo}: Tiempos y volúmenes
+    \item \textbf{analitica}: Configuración GC-FID
+    \item \textbf{datos\_gc}: Referencia a archivo CSV o datos inline
+\end{enumerate}
+
+\subsubsection{Pasos para Usar la Plantilla JSON}
+
+\begin{enumerate}
+    \item Copiar la plantilla:
+    \begin{lstlisting}[style=bashstyle]
+cp plantillas/plantilla_experimento.json mi_experimento_01.json
+    \end{lstlisting}
+
+    \item Editar con un editor de texto (VS Code, Sublime, Notepad++)
+
+    \item Llenar todos los campos con tus datos reales
+
+    \item \textbf{Validar JSON}: Usar validador online (ej. \url{https://jsonlint.com})
+
+    \item Guardar el archivo
+\end{enumerate}
+
+\begin{infobox}{Tip: Múltiples Experimentos}
+Para múltiples experimentos a diferentes temperaturas:
+\begin{itemize}
+    \item Crear \texttt{experimento\_55C.json}
+    \item Crear \texttt{experimento\_65C.json}
+    \item Crear \texttt{experimento\_75C.json}
+    \item Modificar solo los campos que cambian (temperatura, datos GC)
+\end{itemize}
+\end{infobox}
+
+\subsection{Opción 3: Archivo de Configuración YAML (Avanzado)}
+
+El archivo \texttt{config.yaml} permite configurar parámetros globales del sistema.
+
+\subsubsection{Pasos para Configurar}
+
+\begin{enumerate}
+    \item Copiar plantilla:
+    \begin{lstlisting}[style=bashstyle]
+cp plantillas/plantilla_config.yaml config.yaml
+    \end{lstlisting}
+
+    \item Editar secciones relevantes:
+    \begin{itemize}
+        \item \texttt{kinetic\_model}: Tipo de modelo, parámetros iniciales
+        \item \texttt{optimization}: Variables a optimizar, algoritmo
+        \item \texttt{visualization}: Formatos de gráficas, estilo
+    \end{itemize}
+
+    \item Guardar en la raíz del proyecto
+\end{enumerate}
+
+\begin{warningbox}{Configuración Opcional}
+El sistema funciona sin \texttt{config.yaml} usando valores por defecto. Solo créalo si necesitas personalizar parámetros avanzados.
+\end{warningbox}
+
+%==============================================================================
+\section{Ejecución de Módulos Principales}
+%==============================================================================
+
+\subsection{Introducción al Flujo de Trabajo}
+
+El sistema tiene 5 modos de operación principales, ejecutables vía:
+
+\begin{enumerate}
+    \item \textbf{Línea de comandos} (CLI): \texttt{python main.py --mode ...}
+    \item \textbf{Scripts de ejemplo}: \texttt{python ejemplo\_XX\_nombre.py}
+    \item \textbf{Programático}: Importar módulos en tus propios scripts
+\end{enumerate}
+
+Esta sección cubre el flujo típico de trabajo.
+
+\subsection{Módulo 1: Procesamiento de Datos GC-FID}
+
+\subsubsection{Objetivo}
+
+Convertir áreas de picos cromatográficos a concentraciones molares y calcular conversiones.
+
+\subsubsection{Método 1: Línea de Comandos}
+
+\begin{lstlisting}[style=bashstyle]
+python main.py --mode process_gc \
+    --input data/raw/experimento_01.csv \
+    --output data/processed/
+\end{lstlisting}
+
+\textbf{Parámetros}:
+\begin{itemize}
+    \item \texttt{--mode}: \texttt{process\_gc}
+    \item \texttt{--input}: Ruta al archivo CSV con datos GC
+    \item \texttt{--output}: Directorio donde guardar resultados procesados
+\end{itemize}
+
+\subsubsection{Método 2: Script de Ejemplo}
+
+\begin{lstlisting}[style=bashstyle]
+cp plantillas/ejemplo_01_procesar_gc.py .
+python ejemplo_01_procesar_gc.py
+\end{lstlisting}
+
+\textbf{Antes de ejecutar}, editar el script para ajustar:
+\begin{itemize}
+    \item \texttt{INPUT\_FILE}: Ruta a tu archivo CSV
+    \item \texttt{C\_TG\_INICIAL}: Concentración inicial de TG (mol/L)
+    \item \texttt{TEMPERATURA}: Temperatura del experimento (°C)
+\end{itemize}
+
+\subsubsection{Resultados Generados}
+
+\begin{enumerate}
+    \item \textbf{Archivo CSV procesado}: \texttt{data/processed/resultados\_gc\_procesados.csv}
+
+    Contiene:
+    \begin{itemize}
+        \item Tiempo (min)
+        \item Concentraciones: C\_TG, C\_MeOH, C\_FAME, C\_GL (mol/L)
+        \item Conversión (\%)
+        \item Rendimiento FAME (\%)
+    \end{itemize}
+
+    \item \textbf{Gráficas}: \texttt{results/figures/procesamiento\_gc.png}
+
+    Incluye 4 subgráficas:
+    \begin{itemize}
+        \item Conversión vs tiempo
+        \item Perfiles de concentración (TG, FAME, GL)
+        \item Rendimiento de FAME
+        \item Balance de reactivos (TG, MeOH)
+    \end{itemize}
+
+    \item \textbf{Salida en consola}: Estadísticas del procesamiento
+\end{enumerate}
+
+\subsubsection{Interpretación de Resultados}
+
+\begin{table}[H]
+\centering
+\caption{Métricas clave del procesamiento GC}
+\begin{tabular}{lll}
+\toprule
+\textbf{Métrica} & \textbf{Significado} & \textbf{Valores típicos} \\
+\midrule
+Conversión final & \% de TG convertido & 85-95\% (óptimo) \\
+Rendimiento FAME & \% de FAME producido & 80-90\% \\
+Selectividad & FAME/productos totales & > 90\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{successbox}{¿Qué Sigue?}
+Una vez procesados los datos GC, el siguiente paso es ajustar los parámetros cinéticos (Sección 4.3).
+\end{successbox}
+
+\newpage
+\subsection{Módulo 2: Ajuste de Parámetros Cinéticos}
+
+\subsubsection{Objetivo}
+
+Determinar los parámetros cinéticos ($A$ y $E_a$) que mejor ajustan los datos experimentales.
+
+\textbf{Ecuación de Arrhenius}:
+\begin{equation}
+k(T) = A \cdot \exp\left(-\frac{E_a}{RT}\right)
+\end{equation}
+
+donde:
+\begin{itemize}
+    \item $k(T)$: Constante de velocidad (min$^{-1}$)
+    \item $A$: Factor pre-exponencial (min$^{-1}$)
+    \item $E_a$: Energía de activación (kJ/mol)
+    \item $R$: Constante de gases = 8.314 J/(mol·K)
+    \item $T$: Temperatura (K)
+\end{itemize}
+
+\subsubsection{Requisitos}
+
+Para un ajuste robusto, necesitas datos de \textbf{al menos 3 experimentos a diferentes temperaturas}:
+
+\begin{itemize}
+    \item Experimento a baja T (ej. 55°C)
+    \item Experimento a T media (ej. 65°C)
+    \item Experimento a alta T (ej. 75°C)
+\end{itemize}
+
+Todos procesados con el Módulo 1 (Sección 4.2).
+
+\subsubsection{Método 1: Línea de Comandos}
+
+\begin{lstlisting}[style=bashstyle]
+python main.py --mode fit_params \
+    --input variables_esterificacion_dataset.json \
+    --output results/parameter_fitting/
+\end{lstlisting}
+
+\subsubsection{Método 2: Script de Ejemplo}
+
+\begin{lstlisting}[style=bashstyle]
+cp plantillas/ejemplo_02_ajustar_parametros.py .
+# Editar archivo para especificar rutas de experimentos
+python ejemplo_02_ajustar_parametros.py
+\end{lstlisting}
+
+\textbf{Editar en el script}:
+
+\begin{lstlisting}[style=pythonstyle]
+EXPERIMENTOS = [
+    {'file': 'data/processed/exp_55C.csv', 'temperatura': 55.0},
+    {'file': 'data/processed/exp_65C.csv', 'temperatura': 65.0},
+    {'file': 'data/processed/exp_75C.csv', 'temperatura': 75.0},
+]
+\end{lstlisting}
+
+\subsubsection{Resultados Generados}
+
+\begin{enumerate}
+    \item \textbf{Archivo JSON}: \texttt{results/parameter\_fitting/parametros\_ajustados.json}
+
+    Contiene:
+    \begin{lstlisting}[basicstyle=\ttfamily\small]
+{
+  "modelo": "1-step",
+  "reversible": true,
+  "parametros": {
+    "A_forward": 2.98e10,  // min^-1
+    "Ea_forward": 51.9,    // kJ/mol
+    "A_reverse": 1.5e8,
+    "Ea_reverse": 45.0
+  },
+  "metricas": {
+    "R_squared": 0.9876,
+    "RMSE": 1.234,
+    "MAE": 0.987
+  },
+  "intervalos_confianza": { ... }
+}
+    \end{lstlisting}
+
+    \item \textbf{Gráfica de ajuste}: \texttt{results/parameter\_fitting/ajuste\_parametros.png}
+
+    Muestra conversión experimental vs modelo para cada temperatura.
+\end{enumerate}
+
+\subsubsection{Interpretación de Resultados}
+
+\begin{infobox}{Evaluación de la Calidad del Ajuste}
+\textbf{Coeficiente de determinación ($R^2$)}:
+\begin{itemize}
+    \item $R^2 > 0.95$: Excelente ajuste
+    \item $0.90 < R^2 < 0.95$: Buen ajuste
+    \item $0.80 < R^2 < 0.90$: Aceptable
+    \item $R^2 < 0.80$: Ajuste pobre, revisar datos
+\end{itemize}
+
+\textbf{RMSE (Root Mean Square Error)}:
+\begin{itemize}
+    \item RMSE < 2\%: Muy bueno
+    \item RMSE < 5\%: Aceptable
+    \item RMSE > 10\%: Revisar modelo o datos
+\end{itemize}
+\end{infobox}
+
+\textbf{Valores típicos de literatura para CaO}:
+\begin{itemize}
+    \item $E_a$: 50-80 kJ/mol
+    \item $A$: $10^8$ - $10^{11}$ min$^{-1}$
+\end{itemize}
+
+Si tus valores ajustados difieren significativamente, considera:
+\begin{enumerate}
+    \item Calidad de los datos experimentales
+    \item Tipo de aceite usado (puede afectar cinética)
+    \item Pureza del catalizador CaO
+    \item Modelo cinético (¿es apropiado el de 1 paso?)
+\end{enumerate}
+
+\subsection{Módulo 3: Optimización de Condiciones Operacionales}
+
+\subsubsection{Objetivo}
+
+Encontrar las condiciones óptimas de operación que maximizan la conversión de triglicéridos:
+
+\begin{itemize}
+    \item Temperatura (°C)
+    \item Agitación (RPM)
+    \item Concentración de catalizador (\% masa)
+\end{itemize}
+
+\subsubsection{Método 1: Línea de Comandos}
+
+\begin{lstlisting}[style=bashstyle]
+python main.py --mode optimize \
+    --input results/parameter_fitting/parametros_ajustados.json \
+    --output results/optimization/
+\end{lstlisting}
+
+\subsubsection{Método 2: Script de Ejemplo}
+
+\begin{lstlisting}[style=bashstyle]
+cp plantillas/ejemplo_03_optimizar.py .
+python ejemplo_03_optimizar.py
+\end{lstlisting}
+
+\textbf{Configuración en el script}:
+
+\begin{itemize}
+    \item \texttt{PARAMETROS\_CINETICOS}: Usar valores del Módulo 2
+    \item \texttt{C0}: Condiciones iniciales (mol/L)
+    \item \texttt{TIEMPO\_REACCION}: Tiempo total (min)
+    \item \texttt{BOUNDS}: Límites de optimización
+\end{itemize}
+
+\subsubsection{Algoritmos de Optimización Disponibles}
+
+\begin{table}[H]
+\centering
+\caption{Algoritmos de optimización soportados}
+\begin{tabular}{lll}
+\toprule
+\textbf{Algoritmo} & \textbf{Ventajas} & \textbf{Desventajas} \\
+\midrule
+Differential Evolution & Global, robusto & Lento (1-5 min) \\
+SLSQP & Rápido & Local (depende de inicial) \\
+Dual Annealing & Muy robusto & Muy lento (5-10 min) \\
+Nelder-Mead & Simple & Local \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Recomendación}: Usar \texttt{differential\_evolution} para búsqueda global.
+
+\subsubsection{Resultados Generados}
+
+\begin{enumerate}
+    \item \textbf{Archivo JSON}: \texttt{results/optimization/condiciones\_optimas.json}
+
+    \begin{lstlisting}[basicstyle=\ttfamily\small]
+{
+  "condiciones_optimas": {
+    "temperature": 67.3,    // °C
+    "rpm": 580.0,
+    "catalyst_%": 3.2,
+    "conversion_%": 94.7
+  },
+  "analisis_sensibilidad": {
+    "temperature": +0.45,    // Sensibilidad positiva
+    "rpm": +0.12,
+    "catalyst_%": +0.38
+  }
+}
+    \end{lstlisting}
+
+    \item \textbf{Superficie de respuesta 3D}: \texttt{results/optimization/superficie\_respuesta.png}
+
+    Gráfica 3D mostrando cómo varía la conversión con T y \% catalizador (a RPM fijo).
+
+    \item \textbf{Tornado plot}: \texttt{results/optimization/analisis\_sensibilidad.png}
+
+    Gráfica de barras mostrando qué variable tiene mayor impacto en la conversión.
+\end{enumerate}
+
+\subsubsection{Interpretación del Análisis de Sensibilidad}
+
+\begin{infobox}{Sensibilidad}
+Un valor de sensibilidad positivo significa que \textbf{aumentar} esa variable \textbf{aumenta} la conversión.
+
+\textbf{Ejemplo}:
+\begin{itemize}
+    \item Sensibilidad(T) = +0.45 → Temperatura es la variable MÁS importante
+    \item Sensibilidad(RPM) = +0.12 → RPM tiene efecto moderado
+    \item Sensibilidad(Cat) = +0.38 → Catalizador muy importante
+\end{itemize}
+
+\textbf{Implicación práctica}: Si quieres mejorar conversión, prioriza ajustar temperatura, luego catalizador, luego RPM.
+\end{infobox}
+
+\subsection{Módulo 4: Comparación de Modelos}
+
+\subsubsection{Objetivo}
+
+Comparar estadísticamente los resultados entre diferentes modelos o configuraciones.
+
+\subsubsection{Métricas Calculadas}
+
+\begin{itemize}
+    \item \textbf{RMSE}: Root Mean Square Error
+    \item \textbf{MAE}: Mean Absolute Error
+    \item \textbf{R$^2$}: Coeficiente de determinación
+    \item \textbf{MAPE}: Mean Absolute Percentage Error
+    \item \textbf{Pearson r}: Correlación de Pearson
+\end{itemize}
+
+\subsubsection{Ejecución}
+
+\begin{lstlisting}[style=bashstyle]
+python main.py --mode compare \
+    --input results/ \
+    --output results/comparison/
+\end{lstlisting}
+
+\subsubsection{Interpretación}
+
+\begin{table}[H]
+\centering
+\caption{Criterios de evaluación de comparación}
+\begin{tabular}{lll}
+\toprule
+\textbf{Métrica} & \textbf{Valor bueno} & \textbf{Interpretación} \\
+\midrule
+R$^2$ & > 0.95 & Excelente correlación \\
+RMSE & < 2\% & Error muy bajo \\
+MAPE & < 5\% & Error relativo aceptable \\
+Pearson r & > 0.95 & Correlación lineal fuerte \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{successbox}{Validación Exitosa}
+Si R$^2 > 0.95$ y MAPE < 5\%, tu modelo muestra excelente precisión. Puedes confiar en los resultados del modelo para predicciones y optimización.
+\end{successbox}
+
+%==============================================================================
+\section{Interpretación de Resultados}
+%==============================================================================
+
+\subsection{Gráficas Generadas}
+
+\subsubsection{Conversión vs Tiempo}
+
+\textbf{Ubicación}: \texttt{results/figures/conversion\_vs\_time.png}
+
+\textbf{Cómo leer}:
+\begin{itemize}
+    \item Eje X: Tiempo de reacción (min)
+    \item Eje Y: Conversión de TG (\%)
+    \item Puntos: Datos experimentales
+    \item Línea continua: Modelo ajustado
+\end{itemize}
+
+\textbf{Qué buscar}:
+\begin{itemize}
+    \item Pendiente inicial alta → Reacción rápida
+    \item Plateau final → Equilibrio alcanzado
+    \item Buen ajuste modelo-experimental → Línea pasa cerca de puntos
+\end{itemize}
+
+\subsubsection{Perfiles de Concentración}
+
+\textbf{Ubicación}: \texttt{results/figures/concentration\_profiles.png}
+
+Muestra evolución de concentraciones de todas las especies:
+\begin{itemize}
+    \item TG (disminuye)
+    \item MeOH (disminuye)
+    \item FAME (aumenta)
+    \item GL (aumenta)
+\end{itemize}
+
+\textbf{Verificación de balance de masa}:
+\begin{equation}
+\Delta n_{TG} \times 3 = \Delta n_{FAME}
+\end{equation}
+\begin{equation}
+\Delta n_{TG} = \Delta n_{GL}
+\end{equation}
+
+\subsubsection{Superficie de Respuesta 3D}
+
+\textbf{Ubicación}: \texttt{results/optimization/superficie\_respuesta.png}
+
+Visualización 3D de cómo la conversión varía con dos variables (ej. T vs \% catalizador).
+
+\textbf{Cómo usar}:
+\begin{itemize}
+    \item Punto rojo = Condiciones óptimas
+    \item Color caliente (rojo/amarillo) = Alta conversión
+    \item Color frío (azul) = Baja conversión
+    \item Identificar región óptima de operación
+\end{itemize}
+
+
+\textbf{Ubicación}: \texttt{results/comparison/parity\_plot.png}
+
+
+\textbf{Interpretación}:
+\begin{itemize}
+    \item Puntos sobre línea y=x → Modelos coinciden
+    \item Dispersión pequeña → Buena correlación
+    \item Puntos alejados → Discrepancias (revisar)
+\end{itemize}
+
+\subsection{Archivos de Salida}
+
+\subsubsection{Archivos JSON}
+
+Formato estructurado, fácil de leer por programas:
+
+\begin{lstlisting}[style=pythonstyle, caption=Leer JSON en Python]
+import json
+with open('results/parametros_ajustados.json', 'r') as f:
+    data = json.load(f)
+print(f"Ea = {data['parametros']['Ea_forward']} kJ/mol")
+\end{lstlisting}
+
+\subsubsection{Archivos Excel}
+
+Múltiples hojas con resultados organizados:
+\begin{itemize}
+    \item Hoja 1: Parámetros ajustados
+    \item Hoja 2: Métricas de ajuste
+    \item Hoja 3: Datos experimentales vs modelo
+    \item Hoja 4: Condiciones óptimas
+\end{itemize}
+
+Abre con Excel, LibreOffice Calc o Google Sheets.
+
+\subsubsection{Archivos CSV}
+
+Datos tabulares simples, compatibles con cualquier software de análisis de datos.
+
+Ejemplo de uso en R:
+
+\begin{lstlisting}[style=bashstyle]
+> data <- read.csv("results/resultados_procesados.csv")
+> plot(data$Tiempo_min, data$Conversion_pct)
+\end{lstlisting}
+
+%==============================================================================
+\section{Casos de Uso Avanzados}
+%==============================================================================
+
+\subsection{Workflow Completo Automatizado}
+
+Para ejecutar TODO el análisis de una vez:
+
+\begin{lstlisting}[style=bashstyle]
+cp plantillas/ejemplo_06_workflow_completo.py .
+# Editar rutas de archivos
+python ejemplo_06_workflow_completo.py
+\end{lstlisting}
+
+Este script ejecuta en secuencia:
+\begin{enumerate}
+    \item Procesamiento GC (todos los experimentos)
+    \item Ajuste de parámetros
+    \item Optimización de condiciones
+    \item Generación de reportes
+\end{enumerate}
+
+\subsection{Uso Programático (Scripts Personalizados)}
+
+Puedes importar los módulos en tus propios scripts Python:
+
+\begin{lstlisting}[style=pythonstyle]
+from src.models.kinetic_model import KineticModel
+
+# Crear modelo
+model = KineticModel(model_type='1-step', reversible=True, temperature=65.0)
+
+# Condiciones iniciales
+C0 = {'TG': 0.5, 'MeOH': 4.5, 'FAME': 0.0, 'GL': 0.0}
+
+# Simular
+results = model.simulate(t_span=(0, 120), C0=C0)
+
+# Acceder a resultados
+print(f"Conversión final: {results['conversion_%'][-1]:.2f}%")
+\end{lstlisting}
+
+Ver más ejemplos en README.md sección "Uso Programático".
+
+\subsection{Integración con CFD (Ansys Fluent)}
+
+\subsubsection{Especificaciones del Reactor 20L}
+
+El documento \texttt{docs/reactor\_cfd\_specs.md} contiene especificaciones completas para simular el reactor en Ansys Fluent:
+
+\textbf{Geometría actualizada}:
+\begin{itemize}
+    \item \textbf{Impulsor}: Hélice de flujo axial de 3 palas (NO Rushton)
+    \item \textbf{Baffles}: SIN deflectores
+    \item \textbf{Serpentín}: 10 vueltas helicoidales de acero inoxidable (d = 8 mm)
+    \item Volumen: 20 L
+    \item Diámetro tanque: 270 mm
+    \item Altura líquido: 350 mm
+\end{itemize}
+
+\subsubsection{Pasos para CFD}
+
+\begin{enumerate}
+    \item Crear geometría CAD según especificaciones (sección Anexo A del documento CFD)
+    \item Generar malla en Fluent Meshing (500k-1M celdas)
+    \item Configurar modelos físicos:
+    \begin{itemize}
+        \item Turbulencia: k-ε RNG
+        \item Especies: TG, MeOH, FAME, GL
+        \item Reacción: UDF con parámetros ajustados
+    \end{itemize}
+    \item Ejecutar simulación
+    \item Post-procesar: campos de velocidad, temperatura, concentración
+\end{enumerate}
+
+\textbf{UDF disponible}: Ver sección 8 de \texttt{reactor\_cfd\_specs.md} para código C completo.
+
+\textbf{Script PyFluent}: Sección 10 tiene script Python para automatizar setup.
+
+\subsection{Batch Processing (Múltiples Experimentos)}
+
+Para procesar múltiples experimentos automáticamente:
+
+\begin{lstlisting}[style=pythonstyle]
+import glob
+from src.data_processing.gc_processor import GCProcessor
+
+processor = GCProcessor()
+
+# Procesar todos los CSV en data/raw/
+for file in glob.glob('data/raw/*.csv'):
+    print(f"Procesando: {file}")
+    data = processor.load_from_csv(file)
+    results = processor.process_time_series(data, C_TG0=0.5)
+
+    # Guardar resultados
+    output_name = file.replace('raw', 'processed')
+    results.to_csv(output_name, index=False)
+
+print("Batch processing completado")
+\end{lstlisting}
+
+%==============================================================================
+\section{Troubleshooting (Resolución de Problemas)}
+%==============================================================================
+
+\subsection{Errores Comunes de Instalación}
+
+\subsubsection{Error: "ModuleNotFoundError: No module named 'numpy'"}
+
+\textbf{Causa}: Dependencias no instaladas.
+
+\textbf{Solución}:
+\begin{lstlisting}[style=bashstyle]
+pip install -r requirements.txt
+\end{lstlisting}
+
+\subsubsection{Error: "pip: command not found"}
+
+\textbf{Causa}: pip no está instalado o no está en PATH.
+
+\textbf{Solución}:
+\begin{itemize}
+    \item Linux/Mac: \texttt{sudo apt install python3-pip} o \texttt{brew install python}
+    \item Windows: Reinstalar Python marcando "Add to PATH"
+\end{itemize}
+
+\subsubsection{Error al instalar pywin32 en Linux/Mac}
+
+\textbf{Causa}: pywin32 solo funciona en Windows.
+
+
+\subsection{Errores de Datos}
+
+\subsubsection{Error: "KeyError: 'TG'"}
+
+\textbf{Causa}: Nombre de compuesto incorrecto en CSV.
+
+\textbf{Solución}: Verificar que los nombres de compuestos sean exactamente:
+\texttt{TG}, \texttt{MeOH}, \texttt{FAME}, \texttt{GL}, \texttt{Estándar\_Interno}
+
+(Respetar mayúsculas/minúsculas y guiones bajos)
+
+\subsubsection{Error: "FileNotFoundError"}
+
+\textbf{Causa}: Ruta de archivo incorrecta o archivo no existe.
+
+\textbf{Solución}:
+\begin{enumerate}
+    \item Verificar que el archivo existe: \texttt{ls data/raw/mi\_archivo.csv}
+    \item Usar rutas absolutas si es necesario
+    \item Verificar permisos de lectura del archivo
+\end{enumerate}
+
+\subsubsection{Error: "JSON decode error"}
+
+\textbf{Causa}: Archivo JSON mal formado.
+
+\textbf{Solución}:
+\begin{enumerate}
+    \item Copiar contenido del JSON
+    \item Pegar en validador online: \url{https://jsonlint.com}
+    \item Corregir errores indicados (comas faltantes, comillas, etc.)
+\end{enumerate}
+
+\subsection{Errores de Convergencia}
+
+\subsubsection{Advertencia: "Integration failed to converge"}
+
+\textbf{Causa}: Parámetros cinéticos extremos o condiciones iniciales inválidas.
+
+\textbf{Solución}:
+\begin{enumerate}
+    \item Verificar valores de $A$ y $E_a$ (deben estar en rangos razonables)
+    \item Verificar $C_0$ (concentraciones positivas, relación molar coherente)
+    \item Reducir tolerancias: modificar \texttt{rtol} y \texttt{atol} en código
+\end{enumerate}
+
+\subsubsection{Error: "Optimization did not converge"}
+
+\textbf{Causa}: Algoritmo de optimización no encontró óptimo en iteraciones permitidas.
+
+\textbf{Solución}:
+\begin{enumerate}
+    \item Aumentar \texttt{maxiter} (ej. de 100 a 500)
+    \item Probar algoritmo diferente (ej. \texttt{dual\_annealing})
+    \item Ajustar límites de optimización (pueden ser muy estrechos)
+\end{enumerate}
+
+
+
+
+\textbf{Solución}:
+\begin{enumerate}
+\end{enumerate}
+
+
+\textbf{Causa}: Permisos insuficientes.
+
+\textbf{Solución}: Ejecutar Python/script como administrador.
+
+
+\textbf{Causa}: Condiciones termodinámicas inválidas o parámetros extremos.
+
+\textbf{Solución}:
+\begin{enumerate}
+    \item Revisar paquete termodinámico (UNIFAC es apropiado para biodiésel)
+    \item Simplificar modelo (usar reacción más simple)
+    \item Revisar conversión batch→continuo en \texttt{data\_sync.py}
+\end{enumerate}
+
+\subsection{Problemas de Rendimiento}
+
+\subsubsection{Optimización muy lenta}
+
+\textbf{Soluciones}:
+\begin{enumerate}
+    \item Reducir \texttt{maxiter} (sacrifica precisión por velocidad)
+    \item Usar algoritmo más rápido: \texttt{SLSQP} o \texttt{Nelder-Mead}
+    \item Reducir resolución de superficie de respuesta
+    \item Usar menos puntos en simulación (reducir \texttt{n\_points})
+\end{enumerate}
+
+\subsubsection{Memoria insuficiente}
+
+\textbf{Soluciones}:
+\begin{enumerate}
+    \item Procesar experimentos de uno en uno (no batch)
+    \item Reducir resolución de gráficas
+    \item Cerrar otras aplicaciones
+    \item Si es en CFD: usar malla más gruesa
+\end{enumerate}
+
+\subsection{Obtener Ayuda Adicional}
+
+\begin{infobox}{Recursos de Soporte}
+\begin{itemize}
+    \item \textbf{Documentación principal}: \texttt{README.md}
+    \item \textbf{Documentación académica}: \texttt{docs/documento\_latex.tex}
+    \item \textbf{Especificaciones CFD}: \texttt{docs/reactor\_cfd\_specs.md}
+    \item \textbf{Ejemplos de código}: Carpeta \texttt{plantillas/}
+    \item \textbf{Issues en GitHub}: Reportar bugs o pedir features
+\end{itemize}
+\end{infobox}
+
+%==============================================================================
+\section{Apéndices}
+%==============================================================================
+
+\subsection{Apéndice A: Comandos Rápidos de Referencia}
+
+\begin{table}[H]
+\centering
+\caption{Comandos principales del sistema}
+\begin{tabular}{p{0.45\textwidth}p{0.45\textwidth}}
+\toprule
+\textbf{Acción} & \textbf{Comando} \\
+\midrule
+Activar entorno virtual (Linux/Mac) & \texttt{source venv/bin/activate} \\
+Activar entorno virtual (Windows) & \texttt{venv\textbackslash Scripts\textbackslash activate} \\
+Procesar datos GC & \texttt{python main.py --mode process\_gc --input data/raw/exp.csv} \\
+Ajustar parámetros & \texttt{python main.py --mode fit\_params --input exp.json} \\
+Optimizar condiciones & \texttt{python main.py --mode optimize --output results/} \\
+Comparar modelos & \texttt{python main.py --mode compare} \\
+Workflow completo & \texttt{python ejemplo\_06\_workflow\_completo.py} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Apéndice B: Estructura de Directorios}
+
+\begin{lstlisting}[basicstyle=\ttfamily\small]
+mod_esterificacion/
+├── data/
+│   ├── raw/                  # Datos GC-FID crudos (CSV)
+│   ├── processed/            # Datos procesados
+│   └── literature/           # Datos de literatura
+├── src/
+│   ├── data_processing/      # Módulos de procesamiento
+│   ├── models/               # Modelos cinéticos
+│   ├── optimization/         # Optimización
+│   ├── visualization/        # Gráficas
+│   └── utils/                # Utilidades
+├── results/                  # Resultados generados
+│   ├── figures/              # Gráficas PNG/PDF
+│   ├── reports/              # Reportes Excel/PDF
+│   └── exports/              # Exportaciones JSON
+├── docs/                     # Documentación
+│   ├── documento_latex.tex   # Doc académico
+│   ├── reactor_cfd_specs.md  # Especificaciones CFD
+│   └── tutorial_uso_sistema.tex  # Este tutorial
+├── plantillas/               # Plantillas listas para usar
+│   ├── plantilla_datos_gc.csv
+│   ├── plantilla_experimento.json
+│   ├── plantilla_config.yaml
+│   └── ejemplo_XX_*.py       # 6 scripts de ejemplo
+├── main.py                   # CLI principal
+├── requirements.txt          # Dependencias Python
+├── README.md                 # Documentación principal
+└── variables_esterificacion_dataset.json  # Esquema de datos
+\end{lstlisting}
+
+\subsection{Apéndice C: Glosario de Términos}
+
+\begin{description}
+    \item[FAME] Fatty Acid Methyl Esters (Ésteres Metílicos de Ácidos Grasos) - Componente principal del biodiésel
+    \item[TG] Triglicéridos - Aceite vegetal (reactivo)
+    \item[DG] Diglicéridos - Intermediario de reacción
+    \item[MG] Monoglicéridos - Intermediario de reacción
+    \item[GL] Glicerol - Subproducto de reacción
+    \item[GC-FID] Gas Chromatography - Flame Ionization Detector (Cromatografía de Gases con Detector de Ionización de Llama)
+    \item[CFD] Computational Fluid Dynamics (Dinámica de Fluidos Computacional)
+    \item[Ea] Energía de activación (kJ/mol)
+    \item[A] Factor pre-exponencial de Arrhenius (min$^{-1}$)
+    \item[RMSE] Root Mean Square Error (Error Cuadrático Medio)
+    \item[MAE] Mean Absolute Error (Error Absoluto Medio)
+    \item[R$^2$] Coeficiente de determinación
+    \item[MRF] Multiple Reference Frame (Marco de Referencia Múltiple)
+    \item[UDF] User-Defined Function (Función Definida por Usuario) en Fluent
+    \item[VOF] Volume of Fluid (Modelo multifásico)
+\end{description}
+
+\subsection{Apéndice D: Referencias Bibliográficas}
+
+\begin{enumerate}
+    \item Kouzu, M., et al. (2008). "Heterogeneous catalysis of calcium oxide used for transesterification of soybean oil with refluxing methanol". \textit{Applied Catalysis A}, 355(1-2), 94-99.
+
+    \item Sharma, Y.C., et al. (2011). "Optimization of parameters for biodiesel production from Jatropha curcas oil". \textit{Fuel}, 90(3), 1083-1088.
+
+    \item Paul, E.L., Atiemo-Obeng, V.A., \& Kresta, S.M. (2004). \textit{Handbook of Industrial Mixing}. Wiley.
+
+    \item Nienow, A.W. (1997). "On impeller circulation and mixing effectiveness in the turbulent flow regime". \textit{Chemical Engineering Science}, 52(15), 2557-2565.
+
+    \item Ansys Inc. (2023). \textit{Ansys Fluent Theory Guide}. Release 2023 R1.
+\end{enumerate}
+
+%==============================================================================
+% FIN DEL DOCUMENTO
+%==============================================================================
+
+\vspace{2cm}
+
+\begin{center}
+\rule{\textwidth}{0.4pt}
+
+\vspace{0.5cm}
+
+\textbf{\Large ¡Gracias por usar el Sistema de Modelado de Esterificación!}
+
+\vspace{0.3cm}
+
+Si este tutorial te fue útil, considera:
+\begin{itemize}
+    \item Contribuir al proyecto en GitHub
+    \item Reportar bugs o sugerir mejoras
+    \item Compartir tus resultados con la comunidad
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textit{Versión 1.0 -- \today}
+
+\rule{\textwidth}{0.4pt}
+\end{center}
+
+\end{document}

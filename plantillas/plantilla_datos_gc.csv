@@ -1,0 +1,36 @@
+tiempo_min,compuesto,area_pico,tiempo_retencion_min,notas
+0,TG,15000.0,12.5,Tiempo inicial - antes de reacción
+0,MeOH,50000.0,2.1,Tiempo inicial - antes de reacción
+0,FAME,0.0,8.3,Tiempo inicial - antes de reacción
+0,GL,0.0,14.2,Tiempo inicial - antes de reacción
+0,Estándar_Interno,25000.0,10.0,Tiempo inicial - antes de reacción
+10,TG,13500.0,12.5,Muestra a 10 minutos
+10,MeOH,48000.0,2.1,Muestra a 10 minutos
+10,FAME,1500.0,8.3,Muestra a 10 minutos
+10,GL,150.0,14.2,Muestra a 10 minutos
+10,Estándar_Interno,25000.0,10.0,Muestra a 10 minutos
+20,TG,12000.0,12.5,Muestra a 20 minutos
+20,MeOH,46000.0,2.1,Muestra a 20 minutos
+20,FAME,3500.0,8.3,Muestra a 20 minutos
+20,GL,350.0,14.2,Muestra a 20 minutos
+20,Estándar_Interno,25000.0,10.0,Muestra a 20 minutos
+30,TG,10500.0,12.5,Muestra a 30 minutos
+30,MeOH,44000.0,2.1,Muestra a 30 minutos
+30,FAME,5500.0,8.3,Muestra a 30 minutos
+30,GL,550.0,14.2,Muestra a 30 minutos
+30,Estándar_Interno,25000.0,10.0,Muestra a 30 minutos
+60,TG,7500.0,12.5,Muestra a 60 minutos
+60,MeOH,40000.0,2.1,Muestra a 60 minutos
+60,FAME,9500.0,8.3,Muestra a 60 minutos
+60,GL,950.0,14.2,Muestra a 60 minutos
+60,Estándar_Interno,25000.0,10.0,Muestra a 60 minutos
+90,TG,5000.0,12.5,Muestra a 90 minutos
+90,MeOH,37000.0,2.1,Muestra a 90 minutos
+90,FAME,12500.0,8.3,Muestra a 90 minutos
+90,GL,1250.0,14.2,Muestra a 90 minutos
+90,Estándar_Interno,25000.0,10.0,Muestra a 90 minutos
+120,TG,3500.0,12.5,Muestra a 120 minutos (final)
+120,MeOH,35000.0,2.1,Muestra a 120 minutos (final)
+120,FAME,14500.0,8.3,Muestra a 120 minutos (final)
+120,GL,1450.0,14.2,Muestra a 120 minutos (final)
+120,Estándar_Interno,25000.0,10.0,Muestra a 120 minutos (final)

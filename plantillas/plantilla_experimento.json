@@ -1,0 +1,131 @@
+{
+  "experimento": {
+    "id": "Exp_01",
+    "fecha": "2025-01-15",
+    "operador": "Nombre del Operador",
+    "descripcion": "Experimento de transesterificación con CaO - Condiciones estándar",
+    "notas": "Completar con notas adicionales del experimento"
+  },
+
+  "reactivos": {
+    "aceite": {
+      "tipo": "Palma / Soya / Girasol / Otro",
+      "masa_g": 100.0,
+      "densidad_g_mL": 0.92,
+      "MW_triglicerido_promedio_g_mol": 807.0,
+      "composicion_acidos_grasos": {
+        "C16_0_palmitico_%": 40.0,
+        "C18_0_estearico_%": 5.0,
+        "C18_1_oleico_%": 42.0,
+        "C18_2_linoleico_%": 10.0,
+        "otros_%": 3.0
+      }
+    },
+    "metanol": {
+      "volumen_mL": 50.0,
+      "densidad_g_mL": 0.792,
+      "pureza_%": 99.5,
+      "MW_g_mol": 32.04
+    },
+    "relacion_molar_MeOH_aceite": 9.0
+  },
+
+  "catalizador": {
+    "tipo": "CaO",
+    "masa_g": 3.0,
+    "porcentaje_masa_aceite_%": 3.0,
+    "pureza_%": 95.0,
+    "area_superficial_m2_g": 15.0,
+    "tamaño_particula_um": 50.0,
+    "metodo_preparacion": "Calcinación de CaCO3 a 800°C por 4 horas"
+  },
+
+  "condiciones_reaccion": {
+    "temperatura_C": 65.0,
+    "presion_atm": 1.0,
+    "agitacion_rpm": 600,
+    "tiempo_reaccion_min": 120,
+    "volumen_reactor_L": 0.2,
+    "tipo_reactor": "Batch con agitación mecánica",
+    "atmosfera": "Aire / N2 / Vacío"
+  },
+
+  "muestreo": {
+    "tiempos_muestreo_min": [0, 10, 20, 30, 45, 60, 90, 120],
+    "volumen_muestra_mL": 1.0,
+    "metodo_separacion_catalizador": "Centrifugación 5000 rpm por 10 min",
+    "metodo_conservacion": "Refrigeración a 4°C hasta análisis"
+  },
+
+  "analitica": {
+    "gc_fid": {
+      "equipo": "Agilent 7890A / Shimadzu GC-2014 / Otro",
+      "columna": "DB-WAX / HP-5 / Otra",
+      "longitud_columna_m": 30.0,
+      "diametro_interno_mm": 0.32,
+      "espesor_pelicula_um": 0.25,
+      "gas_acarreador": "Helio / Nitrógeno",
+      "flujo_gas_mL_min": 1.2,
+      "temperatura_inyector_C": 250.0,
+      "temperatura_detector_C": 280.0,
+      "relacion_split": 50.0,
+      "volumen_inyeccion_uL": 1.0,
+      "programa_temperatura": {
+        "temperatura_inicial_C": 50.0,
+        "tiempo_inicial_min": 2.0,
+        "rampa_1_C_min": 15.0,
+        "temperatura_final_rampa_1_C": 180.0,
+        "rampa_2_C_min": 5.0,
+        "temperatura_final_C": 230.0,
+        "tiempo_final_min": 5.0
+      }
+    },
+    "estandar_interno": {
+      "compuesto": "Hexadecano / Metil heptadecanoato / Otro",
+      "concentracion_mg_mL": 2.0,
+      "volumen_agregado_uL": 100.0
+    },
+    "factores_respuesta": {
+      "TG": 1.0,
+      "MeOH": 0.85,
+      "FAME": 0.95,
+      "GL": 0.90,
+      "DG": 0.92,
+      "MG": 0.88
+    }
+  },
+
+  "datos_gc": {
+    "archivo_datos_crudos": "data/raw/experimento_01.csv",
+    "formato": "CSV con columnas: tiempo_min, compuesto, area_pico, tiempo_retencion_min",
+    "tiempos_retencion_promedio_min": {
+      "MeOH": 2.1,
+      "FAME": 8.3,
+      "Estandar_Interno": 10.0,
+      "TG": 12.5,
+      "GL": 14.2,
+      "DG": 11.0,
+      "MG": 9.5
+    }
+  },
+
+  "resultados_experimentales": {
+    "conversion_final_%": null,
+    "rendimiento_FAME_%": null,
+    "selectividad_%": null,
+    "pureza_FAME_%": null,
+    "contenido_glicerol_libre_%": null,
+    "observaciones": "Completar después del análisis GC"
+  },
+
+  "parametros_cineticos_ajustados": {
+    "modelo": "1-step / 3-step",
+    "A_forward_min-1": null,
+    "Ea_forward_kJ_mol": null,
+    "A_reverse_min-1": null,
+    "Ea_reverse_kJ_mol": null,
+    "R2": null,
+    "RMSE": null,
+    "notas_ajuste": "Completar después del ajuste de parámetros"
+  }
+}
