@@ -1,0 +1,43 @@
+{
+  "caso": "Caso 1 - Procesamiento GC-FID",
+  "descripcion": "Procesamiento automatizado de datos cromatográficos",
+  "objetivo": "Demostrar facilidad de uso vs Excel/MATLAB manual",
+  "entrada": {
+    "archivo_csv": "datos/experimento_60C.csv",
+    "concentracion_TG_inicial": 0.5,
+    "unidades": "mol/L"
+  },
+  "parametros_procesamiento": {
+    "factores_respuesta": {
+      "TG": 0.95,
+      "DG": 0.98,
+      "MG": 1.02,
+      "FAME": 1.00,
+      "GL": 1.15
+    },
+    "estandar_interno": "FAME",
+    "detectar_outliers": true,
+    "metodo_outliers": "zscore",
+    "umbral_outliers": 3.0
+  },
+  "salida": {
+    "directorio": "resultados/",
+    "formatos": ["csv", "xlsx", "json"],
+    "generar_graficas": true
+  },
+  "condiciones_experimentales": {
+    "temperatura_C": 60,
+    "relacion_molar": 6.0,
+    "catalizador_pct": 1.0,
+    "agitacion_rpm": 400
+  },
+  "validacion": {
+    "conversion_esperada_120min": 92.0,
+    "tolerancia_pct": 5.0
+  },
+  "metricas_evaluacion": {
+    "tiempo_ejecucion_max_s": 10,
+    "pasos_manuales_excel": 20,
+    "pasos_automatizados": 1
+  }
+}

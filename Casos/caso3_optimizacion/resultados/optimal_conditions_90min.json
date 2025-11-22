@@ -1,0 +1,9 @@
+{
+  "t_reaction_min": 90,
+  "temperature_C": 65.0,
+  "rpm": 200.0,
+  "catalyst_%": 0.5,
+  "molar_ratio": 6.0,
+  "conversion_%": 93.04384904591112,
+  "success": true
+}

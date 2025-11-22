@@ -1,0 +1,60 @@
+{
+  "descripcion": "Análisis de Sensibilidad Global - Diseño Factorial 4×4×4×3",
+  "total_simulaciones": 192,
+  "tiempo_ejecucion_s": 2.031123399734497,
+  "parametros_cineticos": {
+    "A_forward": 800000.0,
+    "Ea_forward_kJ_mol": 50.0
+  },
+  "anova": {
+    "Temperatura": {
+      "contribucion_%": 15.742438118724836,
+      "F_statistic": 126.41562017013037,
+      "p_value": 1.1102230246251565e-16,
+      "significativo": true
+    },
+    "Relacion_Molar": {
+      "contribucion_%": 76.78580889812072,
+      "F_statistic": 616.6087856858176,
+      "p_value": 1.1102230246251565e-16,
+      "significativo": true
+    },
+    "Catalizador": {
+      "contribucion_%": 0.0,
+      "F_statistic": 0.0,
+      "p_value": 1.0,
+      "significativo": false
+    },
+    "RPM": {
+      "contribucion_%": 3.384179391912332e-28,
+      "F_statistic": 4.076367968250514e-27,
+      "p_value": 1.0,
+      "significativo": false
+    }
+  },
+  "variables_criticas_top3": [
+    {
+      "factor": "RM",
+      "contribucion_%": 76.78580889812072
+    },
+    {
+      "factor": "T_C",
+      "contribucion_%": 15.742438118724836
+    },
+    {
+      "factor": "RPM",
+      "contribucion_%": 3.384179391912332e-28
+    }
+  ],
+  "validacion_fisica": {
+    "temperatura_efecto_arrhenius": true,
+    "relacion_molar_desplaza_equilibrio": true,
+    "resultados_congruentes": true
+  },
+  "rango_conversion": {
+    "min_%": 73.5232401834738,
+    "max_%": 99.98120401945812,
+    "mean_%": 93.50892296147627,
+    "std_%": 7.745107355802184
+  }
+}

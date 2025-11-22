@@ -1,0 +1,48 @@
+{
+  "reactor_laboratorio": {
+    "volumen_L": 0.35,
+    "diametro_mm": 80.0,
+    "altura_mm": 70.0,
+    "rpm": 400,
+    "reynolds": 9280.000000000002,
+    "regimen": "TRANSICIÓN ⚠"
+  },
+  "reactor_piloto": {
+    "volumen_L": 20.0,
+    "geometria": {
+      "diametro_tanque_mm": 308.13708568866855,
+      "altura_liquido_mm": 269.619949977585,
+      "diametro_impulsor_mm": 115.55140713325072,
+      "relacion_H_D": 0.8750000000000001,
+      "relacion_D_imp_D_tank": 0.37500000000000006
+    },
+    "operacion": {
+      "rpm_seleccionado": 162.78860522636924,
+      "criterio_usado": "P/V constante",
+      "reynolds": 56029.91383339017,
+      "regimen": "TURBULENTO ✓"
+    },
+    "rpm_alternos": {
+      "Np_constante": 42.263943624324504,
+      "P_V_constante": 162.78860522636924,
+      "vtip_constante": 103.8498820370221,
+      "tm_constante": 400.0
+    }
+  },
+  "factores_escala": {
+    "volumetrico": 57.142857142857146,
+    "geometrico": 3.851713571108357
+  },
+  "validacion_cinetica": {
+    "conversion_lab_60min_%": 78.28946020949071,
+    "conversion_pilot_60min_%": 78.28946020949071,
+    "conversion_lab_final_%": 93.35459000341062,
+    "conversion_pilot_final_%": 93.35459000341062,
+    "diferencia_final_%": 0.0,
+    "validado": true
+  },
+  "propiedades_fluido": {
+    "densidad_kg_m3": 870.0,
+    "viscosidad_Pa_s": 0.004
+  }
+}

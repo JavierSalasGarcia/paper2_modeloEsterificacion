@@ -1,0 +1,45 @@
+{
+  "caso": "Caso 2 - Ajuste de Parámetros Cinéticos",
+  "descripcion": "Calibración del modelo con datos de Kouzu et al. (2008)",
+  "objetivo": "Obtener parámetros A y Ea que mejor ajusten los datos experimentales",
+  "entrada": {
+    "archivo_json": "datos/datos_kouzu_4temps.json",
+    "numero_temperaturas": 4,
+    "total_puntos_experimentales": 28
+  },
+  "algoritmos_ajuste": {
+    "principal": "leastsq",
+    "alternativo": "differential_evolution",
+    "comparar_ambos": true
+  },
+  "configuracion_ajuste": {
+    "modelo_cinetico": "1-step",
+    "reversible": true,
+    "metodo_integracion": "Radau",
+    "tolerancia_relativa": 1e-6,
+    "tolerancia_absoluta": 1e-9
+  },
+  "salida": {
+    "directorio": "resultados/",
+    "archivos": {
+      "parametros_json": "parametros_calibrados.json",
+      "metricas_ajuste": "metricas_ajuste.xlsx",
+      "grafica_ajuste": "ajuste_experimental_vs_modelo.png",
+      "grafica_residuales": "analisis_residuales.png",
+      "intervalos_confianza": "intervalos_confianza.png"
+    }
+  },
+  "criterios_aceptacion": {
+    "R_cuadrado_minimo": 0.98,
+    "RMSE_maximo_pct": 5.0,
+    "p_value_residuales_normalidad": 0.05
+  },
+  "metricas_evaluacion": {
+    "tiempo_convergencia_max_s": 60,
+    "comparacion_software_comercial": {
+      "Aspen_Plus_pasos_configuracion": 15,
+      "sistema_propuesto_pasos": 1,
+      "facilidad_relativa": "15x más simple"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "descripcion": "Comparaci\u00f3n de optimizaciones para diferentes tiempos de reacci\u00f3n",
+  "tiempos_evaluados_min": [
+    90
+  ],
+  "resultados": [
+    {
+      "t_reaction_min": 90,
+      "temperature_C": 65.0,
+      "rpm": 200.0,
+      "catalyst_%": 0.5,
+      "molar_ratio": 6.0,
+      "conversion_%": 93.04384904591112,
+      "success": true
+    }
+  ],
+  "conclusion": {
+    "mejor_tiempo": 90,
+    "max_conversion_%": 93.04384904591112,
+    "cumple_EN14214": false
+  }
+}

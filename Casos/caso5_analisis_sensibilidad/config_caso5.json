@@ -1,0 +1,59 @@
+{
+  "caso": "Caso 5 - Análisis de Sensibilidad Global",
+  "descripcion": "Evaluación de influencia de parámetros operacionales en conversión",
+  "objetivo": "Identificar variables críticas mediante diseño factorial y análisis de Pareto",
+  "entrada": {
+    "parametros_cineticos": "usar_calibrados_dataset",
+    "tipo_analisis": "factorial_completo"
+  },
+  "factores_analisis": {
+    "temperatura": {
+      "niveles": [55, 60, 65, 70],
+      "unidad": "°C"
+    },
+    "relacion_molar": {
+      "niveles": [4, 6, 8, 10],
+      "unidad": "mol/mol"
+    },
+    "catalizador": {
+      "niveles": [0.5, 1.0, 1.5, 2.0],
+      "unidad": "% másico"
+    },
+    "agitacion": {
+      "niveles": [300, 500, 700],
+      "unidad": "rpm"
+    }
+  },
+  "diseño_experimental": {
+    "tipo": "factorial_completo",
+    "total_experimentos": 192,
+    "descripcion": "4×4×4×3 = 192 simulaciones"
+  },
+  "metodos_estadisticos": {
+    "anova": true,
+    "efectos_principales": true,
+    "interacciones_2do_orden": true,
+    "pareto_chart": true,
+    "superficie_respuesta": true
+  },
+  "salida": {
+    "directorio": "resultados/",
+    "archivos": {
+      "tabla_anova": "tabla_anova.xlsx",
+      "efectos_principales": "efectos_principales.png",
+      "diagrama_pareto": "diagrama_pareto.png",
+      "interacciones": "interacciones_T_vs_RM.png",
+      "superficie_respuesta": "superficie_respuesta_3D.png",
+      "resultados_completos": "diseño_factorial_completo.xlsx"
+    }
+  },
+  "interpretacion": {
+    "variables_criticas": "Identificar top 3 variables por contribución",
+    "interacciones_significativas": "p-value < 0.05",
+    "recomendaciones": "Optimizar variables críticas, controlar secundarias"
+  },
+  "metricas_evaluacion": {
+    "tiempo_total_simulaciones": "< 5 minutos (192 simulaciones)",
+    "capacidad_paralelizacion": "Hasta 4 núcleos CPU"
+  }
+}

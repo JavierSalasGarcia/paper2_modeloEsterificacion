@@ -1,0 +1,70 @@
+{
+  "model_type": "1-step",
+  "reversible": true,
+  "fitted_parameters": {
+    "Ea_forward": 48.77975866516117,
+    "Ea_reverse": 66.309450067967,
+    "A_forward": 383182.4219279224,
+    "A_reverse": 114884.92662311468
+  },
+  "statistics": {
+    "R_squared": 0.9953069335247732,
+    "chisqr": 0.00345513610477216,
+    "redchi": 0.00014396400436550666,
+    "aic": -244.00274229612,
+    "bic": -238.6739242554192,
+    "nfev": 65
+  },
+  "confidence_intervals": {
+    "Ea_forward": {
+      "value": 48.77975866516117,
+      "stderr": 0.7070603191581057,
+      "ci_lower": 47.3204578894665,
+      "ci_upper": 50.23905944085583,
+      "relative_error_%": 1.4494953204085714
+    },
+    "A_forward": {
+      "value": 383182.4219279224,
+      "stderr": 114508.20609546629,
+      "ci_lower": 146849.1000728846,
+      "ci_upper": 619515.7437829602,
+      "relative_error_%": 29.883470520212324
+    },
+    "Ea_reverse": {
+      "value": 66.309450067967,
+      "stderr": 3741.510430662565,
+      "ci_lower": -7655.788546092736,
+      "ci_upper": 7788.407446228671,
+      "relative_error_%": 5642.499563527562
+    },
+    "A_reverse": {
+      "value": 114884.92662311468,
+      "stderr": 8248244749.989597,
+      "ci_lower": -17023425590.53278,
+      "ci_upper": 17023655360.386024,
+      "relative_error_%": 7179570.891008484
+    }
+  },
+  "experiments": [
+    {
+      "id": "Kouzu_60C",
+      "temperature": 60,
+      "n_points": 7
+    },
+    {
+      "id": "Kouzu_65C",
+      "temperature": 65,
+      "n_points": 7
+    },
+    {
+      "id": "Kouzu_70C",
+      "temperature": 70,
+      "n_points": 7
+    },
+    {
+      "id": "Kouzu_75C",
+      "temperature": 75,
+      "n_points": 7
+    }
+  ]
+}

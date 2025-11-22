@@ -1,0 +1,82 @@
+{
+  "caso": "Caso 6 - Escalado de Reactores",
+  "descripcion": "Diseño de reactor piloto desde condiciones de laboratorio",
+  "objetivo": "Demostrar escalado de 350 mL (lab) a 20 L (piloto) usando criterios de similitud",
+  "entrada": {
+    "reactor_laboratorio": {
+      "volumen_L": 0.35,
+      "diametro_mm": 80,
+      "altura_mm": 70,
+      "tipo_impulsor": "barra_magnetica",
+      "diametro_impulsor_mm": 30,
+      "rpm": 400,
+      "temperatura_C": 60
+    },
+    "reactor_piloto_objetivo": {
+      "volumen_L": 20,
+      "geometria_similar": true,
+      "tipo_impulsor": "cinta_helicoidal"
+    }
+  },
+  "criterios_escalado": {
+    "numero_potencia": {
+      "descripcion": "Mantener Np constante",
+      "formula": "Np = P/(ρ·N³·D⁵)"
+    },
+    "potencia_por_volumen": {
+      "descripcion": "Mantener P/V constante",
+      "formula": "P/V = constante"
+    },
+    "velocidad_punta": {
+      "descripcion": "Mantener velocidad de punta de impulsor",
+      "formula": "vtip = π·D·N"
+    },
+    "tiempo_mezclado": {
+      "descripcion": "Mantener tiempo de mezclado",
+      "formula": "tm ∝ N⁻¹"
+    }
+  },
+  "calculos_incluidos": {
+    "hidrodinamica": true,
+    "transferencia_masa": true,
+    "transferencia_calor": true,
+    "numero_reynolds": true,
+    "numero_potencia": true,
+    "tiempo_mezclado": true
+  },
+  "especificaciones_cfd": {
+    "generar": true,
+    "software_objetivo": "Ansys Fluent / OpenFOAM",
+    "incluir": [
+      "Geometría detallada (CAD)",
+      "Configuración de mallado",
+      "Modelos de turbulencia (k-ε RNG)",
+      "Condiciones de frontera",
+      "UDF para cinética química"
+    ]
+  },
+  "salida": {
+    "directorio": "resultados/",
+    "archivos": {
+      "comparacion_criterios": "comparacion_criterios_escalado.xlsx",
+      "diseño_detallado": "diseño_reactor_piloto.json",
+      "especificaciones_fabricacion": "especificaciones_fabricacion.pdf",
+      "cfd_specs": "cfd_configuration.txt",
+      "validacion_escalado": "validacion_escalado.png"
+    }
+  },
+  "validacion": {
+    "metodo": "Simular reactor lab y piloto con condiciones escaladas",
+    "criterio_exito": "Diferencia en conversión < 5%",
+    "verificar": [
+      "Conversión similar en ambas escalas",
+      "Tiempo de mezclado adecuado",
+      "Número de Reynolds en régimen turbulento"
+    ]
+  },
+  "metricas_evaluacion": {
+    "tiempo_calculo": "< 10 segundos",
+    "precision_geometrica": "Cumplir H/D, D_imp/D_tank ratios",
+    "costos_estimados": "Material, fabricación, instrumentación"
+  }
+}

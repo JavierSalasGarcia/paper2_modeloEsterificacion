@@ -1,0 +1,52 @@
+{
+  "referencia": "Kouzu et al. (2008), Fuel 87:2798-2806",
+  "doi": "10.1016/j.fuel.2007.10.019",
+  "descripcion": "Datos experimentales de transesterificación con CaO a 4 temperaturas",
+  "condiciones_comunes": {
+    "relacion_molar_MeOH_TG": 6.0,
+    "concentracion_catalizador_pct": 1.0,
+    "concentracion_TG_inicial_mol_L": 0.5,
+    "agitacion_rpm": 400
+  },
+  "experimentos": {
+    "60C": {
+      "temperatura_C": 60,
+      "tiempo_min": [0, 20, 40, 60, 80, 100, 120],
+      "conversion_pct": [0, 35, 58, 72, 82, 88, 92]
+    },
+    "65C": {
+      "temperatura_C": 65,
+      "tiempo_min": [0, 20, 40, 60, 80, 100, 120],
+      "conversion_pct": [0, 42, 65, 79, 87, 92, 95]
+    },
+    "70C": {
+      "temperatura_C": 70,
+      "tiempo_min": [0, 20, 40, 60, 80, 100, 120],
+      "conversion_pct": [0, 48, 72, 85, 92, 96, 97]
+    },
+    "75C": {
+      "temperatura_C": 75,
+      "tiempo_min": [0, 20, 40, 60, 80, 100, 120],
+      "conversion_pct": [0, 54, 78, 89, 95, 97, 98]
+    }
+  },
+  "objetivo_ajuste": {
+    "parametros_a_ajustar": ["A_forward", "Ea_forward"],
+    "limites_busqueda": {
+      "A_forward_min": 10000,
+      "A_forward_max": 100000000,
+      "Ea_forward_min": 30000,
+      "Ea_forward_max": 80000
+    },
+    "unidades": {
+      "A_forward": "L/(mol·min)",
+      "Ea_forward": "J/mol"
+    }
+  },
+  "valores_esperados": {
+    "A_forward": 800000,
+    "Ea_forward": 50000,
+    "R_cuadrado_min": 0.98,
+    "RMSE_max_pct": 5.0
+  }
+}

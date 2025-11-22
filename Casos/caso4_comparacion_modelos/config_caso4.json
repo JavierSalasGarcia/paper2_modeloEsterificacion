@@ -1,0 +1,63 @@
+{
+  "caso": "Caso 4 - Comparación de Modelos Mecanísticos",
+  "descripcion": "Evaluación de modelo simplificado (1-paso) vs completo (3-pasos)",
+  "objetivo": "Demostrar capacidades analíticas del sistema y trade-off precisión vs complejidad",
+  "modelos_comparar": {
+    "modelo_1_paso": {
+      "descripcion": "Pseudo-homogéneo reversible simplificado",
+      "ecuacion": "TG + 3 MeOH ⇌ 3 FAME + GL",
+      "especies": ["TG", "MeOH", "FAME", "GL"],
+      "parametros": 2,
+      "ventajas": ["Rápido", "Menos parámetros", "Fácil calibración"],
+      "desventajas": ["No captura intermediarios", "Menor detalle mecanístico"]
+    },
+    "modelo_3_pasos": {
+      "descripcion": "Mecanístico completo con intermediarios",
+      "ecuaciones": [
+        "TG + MeOH ⇌ DG + FAME",
+        "DG + MeOH ⇌ MG + FAME",
+        "MG + MeOH ⇌ GL + FAME"
+      ],
+      "especies": ["TG", "DG", "MG", "MeOH", "FAME", "GL"],
+      "parametros": 6,
+      "ventajas": ["Detalle mecanístico", "Captura intermediarios (DG, MG)", "Mejor para análisis"],
+      "desventajas": ["Más lento", "Más parámetros", "Calibración compleja"]
+    }
+  },
+  "entrada": {
+    "parametros_cineticos": "usar_calibrados_dataset",
+    "condiciones_reaccion": {
+      "temperatura_C": 60,
+      "relacion_molar": 6.0,
+      "concentracion_TG0_mol_L": 0.5,
+      "tiempo_simulacion_min": 120
+    }
+  },
+  "metricas_comparacion": {
+    "conversion_final": true,
+    "perfiles_temporales": true,
+    "intermediarios": true,
+    "tiempo_computo": true,
+    "precision_relativa": true
+  },
+  "salida": {
+    "directorio": "resultados/",
+    "archivos": {
+      "comparacion_metricas": "tabla_comparacion.xlsx",
+      "perfiles_concentracion": "perfiles_1paso_vs_3pasos.png",
+      "conversion_comparada": "conversion_1paso_vs_3pasos.png",
+      "intermediarios_3pasos": "intermediarios_DG_MG.png",
+      "tiempo_computo": "benchmark_tiempo.json"
+    }
+  },
+  "criterios_evaluacion": {
+    "diferencia_conversion_max_pct": 2.0,
+    "ratio_tiempo_computo_max": 5.0,
+    "descripcion": "Modelo 1-paso debe estar dentro de 2% de modelo 3-pasos, tiempo <5x más rápido"
+  },
+  "interpretacion_resultados": {
+    "si_diferencia_pequeña": "Modelo 1-paso suficiente para diseño de reactores",
+    "si_diferencia_grande": "Modelo 3-pasos necesario para análisis detallado",
+    "intermediarios": "Modelo 3-pasos revela acumulación de DG/MG útil para optimización de producto"
+  }
+}

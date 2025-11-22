@@ -1,0 +1,78 @@
+{
+  "caso": "Caso 3 - Optimización Multi-Objetivo",
+  "descripcion": "Búsqueda de condiciones operacionales óptimas",
+  "objetivo": "Encontrar T, relación molar, catalizador y RPM que maximicen conversión",
+  "entrada": {
+    "parametros_cineticos": "usar_calibrados_dataset",
+    "fuente_parametros": "variables_esterificacion_dataset.json",
+    "tipo_modelo": "1-step",
+    "reversible": true
+  },
+  "variables_optimizacion": {
+    "temperatura": {
+      "min": 50,
+      "max": 80,
+      "unidad": "°C",
+      "descripcion": "Temperatura de reacción"
+    },
+    "relacion_molar": {
+      "min": 3,
+      "max": 15,
+      "unidad": "mol/mol",
+      "descripcion": "Relación MeOH:TG"
+    },
+    "catalizador": {
+      "min": 0.5,
+      "max": 5.0,
+      "unidad": "% másico",
+      "descripcion": "Concentración de CaO"
+    },
+    "agitacion": {
+      "min": 200,
+      "max": 800,
+      "unidad": "rpm",
+      "descripcion": "Velocidad de agitación"
+    }
+  },
+  "funcion_objetivo": {
+    "tipo": "maximizar_conversion",
+    "tiempo_reaccion_min": 60,
+    "conversion_objetivo_min_pct": 96.5,
+    "descripcion": "Cumplir norma EN 14214 (>96.5% conversión)"
+  },
+  "algoritmo": {
+    "metodo": "differential_evolution",
+    "estrategia": "best1bin",
+    "maxiter": 200,
+    "popsize": 30,
+    "tolerancia": 0.01,
+    "semilla_aleatoria": 42
+  },
+  "restricciones": {
+    "temperatura_max_seguridad": 70,
+    "relacion_molar_economica_max": 12,
+    "catalizador_max_practico": 3.0,
+    "descripcion_restricciones": "Evitar ebullición MeOH, costos excesivos, saturación"
+  },
+  "salida": {
+    "directorio": "resultados/",
+    "archivos": {
+      "condiciones_optimas": "condiciones_optimas.json",
+      "superficie_respuesta_T_RM": "superficie_T_vs_RM.png",
+      "superficie_respuesta_Cat_RPM": "superficie_Cat_vs_RPM.png",
+      "analisis_sensibilidad": "sensibilidad_parametros.xlsx",
+      "convergencia": "convergencia_optimizacion.png"
+    }
+  },
+  "metricas_evaluacion": {
+    "convergencia_max_iter": 100,
+    "conversion_optima_esperada_pct": 99.0,
+    "tiempo_optimizacion_max_s": 180
+  },
+  "comparacion_software": {
+    "software_comercial": "Aspen Plus Optimizer",
+    "software_generico": "PyOMO con solvers IPOPT/BARON",
+    "sistema_propuesto": "Especializado con Differential Evolution integrado",
+    "ventaja_propuesto": "No requiere definición manual de funciones objetivo complejas"
+  }
+}
