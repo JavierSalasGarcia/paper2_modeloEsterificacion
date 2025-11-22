@@ -44,10 +44,10 @@ from src.data_processing.data_loader import DataLoader
 from src.models.kinetic_model import KineticModel
 from src.models.parameter_fitting import ParameterFitter
 from src.optimization.optimizer import OperationalOptimizer
+from src.optimization.fuzzy_weight_optimizer import FuzzyWeightOptimizer  # Sistema de lógica difusa
 from src.utils.comparison import ModelComparison
 from src.visualization.plotter import ResultsPlotter
 from src.visualization.exporter import ResultsExporter
-from fuzzy_weight_optimizer import FuzzyWeightOptimizer  # Sistema de lógica difusa
 
 # Parámetros cinéticos calibrados de variables_esterificacion_dataset.json
 PARAMETROS_CALIBRADOS = {
