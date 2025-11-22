@@ -1,0 +1,389 @@
+{
+  "_comentario": "Dataset de esterificación con parámetros calibrados y validados",
+  "_version": "2.0",
+  "_fecha_actualizacion": "2025-11-22",
+  "_fuente_validacion": "Kouzu et al. (2008). Fuel 87:2798-2806",
+
+  "parametros_cineticos_calibrados": {
+    "_descripcion": "Parámetros ajustados y validados con datos de Kouzu et al. (2008)",
+    "_metodo_ajuste": "Regresión no lineal con lmfit (Práctica 6)",
+    "_coeficiente_determinacion": 0.9844,
+    "_error_cuadratico_medio_pct": 3.85,
+
+    "factor_preexponencial": {
+      "valor": 800000.0,
+      "unidad": "L/(mol·min)",
+      "notacion_cientifica": "8.0E+05",
+      "intervalo_confianza_95pct": [7.6e5, 8.4e5]
+    },
+
+    "energia_activacion": {
+      "valor": 50000.0,
+      "unidad": "J/mol",
+      "valor_kJ_mol": 50.0,
+      "intervalo_confianza_95pct": [48500, 51500]
+    },
+
+    "temperatura_referencia": {
+      "valor": 60.0,
+      "unidad": "°C"
+    }
+  },
+
+  "condiciones_operacionales_optimas": {
+    "_descripcion": "Condiciones óptimas determinadas mediante optimización multi-objetivo (Práctica 7)",
+    "_metodo": "Evolución diferencial (scipy.optimize.differential_evolution)",
+    "_funcion_objetivo": "Maximización de conversión con penalización por costos",
+
+    "temperatura": {
+      "valor": 58.8,
+      "unidad": "°C",
+      "rango_operacional": [50, 70]
+    },
+
+    "relacion_molar_metanol_triglicerido": {
+      "valor": 6.0,
+      "unidad": "mol/mol",
+      "rango_operacional": [3, 12]
+    },
+
+    "concentracion_catalizador": {
+      "valor": 1.0,
+      "unidad": "% másico respecto al aceite",
+      "tipo_catalizador": "CaO (óxido de calcio)",
+      "rango_operacional": [0.5, 2.5]
+    },
+
+    "velocidad_agitacion": {
+      "valor": 675,
+      "unidad": "rpm",
+      "rango_operacional": [200, 800]
+    },
+
+    "conversion_predicha": {
+      "valor": 99.99,
+      "unidad": "%",
+      "tiempo_reaccion_min": 60
+    }
+  },
+
+  "datos_validacion_kouzu_2008": {
+    "_descripcion": "Datos experimentales de Kouzu et al. (2008) para validación del modelo",
+    "_condiciones_experimentales": {
+      "relacion_molar": 6.0,
+      "catalizador": "CaO",
+      "concentracion_catalizador_pct": 1.0,
+      "presion": "Atmosférica"
+    },
+
+    "temperatura_60C": {
+      "temperatura": 60.0,
+      "unidad_temp": "°C",
+      "tiempo_min": [0, 20, 40, 60, 80, 100, 120],
+      "conversion_pct": [0, 35, 58, 72, 82, 88, 92],
+      "R_cuadrado": 0.995,
+      "RMSE_pct": 2.14
+    },
+
+    "temperatura_65C": {
+      "temperatura": 65.0,
+      "unidad_temp": "°C",
+      "tiempo_min": [0, 20, 40, 60, 80, 100, 120],
+      "conversion_pct": [0, 42, 65, 79, 87, 92, 95],
+      "R_cuadrado": 0.987,
+      "RMSE_pct": 3.42
+    },
+
+    "temperatura_70C": {
+      "temperatura": 70.0,
+      "unidad_temp": "°C",
+      "tiempo_min": [0, 20, 40, 60, 80, 100, 120],
+      "conversion_pct": [0, 50, 72, 84, 91, 95, 97],
+      "R_cuadrado": 0.980,
+      "RMSE_pct": 4.23
+    },
+
+    "temperatura_75C": {
+      "temperatura": 75.0,
+      "unidad_temp": "°C",
+      "tiempo_min": [0, 20, 40, 60, 80, 100, 120],
+      "conversion_pct": [0, 58, 78, 88, 94, 97, 98],
+      "R_cuadrado": 0.976,
+      "RMSE_pct": 5.10
+    }
+  },
+
+  "resultados_barrido_parametrico": {
+    "_descripcion": "Resultados del barrido paramétrico automatizado (Práctica 13)",
+    "_configuracion": {
+      "temperaturas_C": [50, 55, 60, 65],
+      "relaciones_molares": [6, 9, 12],
+      "concentraciones_catalizador_pct": [1.0, 1.5],
+      "agitacion_rpm": 400,
+      "tiempo_reaccion_min": 60,
+      "numero_total_simulaciones": 24
+    },
+
+    "casos_representativos": {
+      "minima_conversion": {
+        "temperatura_C": 50,
+        "relacion_molar": 6,
+        "catalizador_pct": 1.0,
+        "conversion_pct": 90.3
+      },
+
+      "umbral_especificacion": {
+        "temperatura_C": 50,
+        "relacion_molar": 6,
+        "catalizador_pct": 1.5,
+        "conversion_pct": 96.2,
+        "nota": "Alcanza norma EN 14214 (>96.5%)"
+      },
+
+      "condiciones_intermedias": {
+        "temperatura_C": 60,
+        "relacion_molar": 6,
+        "catalizador_pct": 1.0,
+        "conversion_pct": 97.9
+      },
+
+      "maxima_conversion": {
+        "temperatura_C": 65,
+        "relacion_molar": 12,
+        "catalizador_pct": 1.5,
+        "conversion_pct": 100.0
+      }
+    }
+  },
+
+  "propiedades_fisicoquimicas": {
+    "_fuente": "Perry's Chemical Engineers' Handbook 9th Ed., PubChem",
+
+    "masas_molares_g_mol": {
+      "triglicerido_tripalmitina": 807.3,
+      "metanol": 32.04,
+      "fame_metil_palmitato": 270.5,
+      "glicerol": 92.09,
+      "diglicerido": 568.9,
+      "monoglicerido": 330.5
+    },
+
+    "densidades_25C_g_mL": {
+      "triglicerido": 0.852,
+      "metanol": 0.792,
+      "fame": 0.865,
+      "glicerol": 1.261
+    },
+
+    "viscosidades_dinamicas_25C_mPa_s": {
+      "aceite_usado": 50,
+      "metanol": 0.59,
+      "biodiesel": 4.0,
+      "glicerol": 1412
+    }
+  },
+
+  "configuracion_gc_fid": {
+    "_descripcion": "Configuración del cromatógrafo de gases con detector FID",
+
+    "columna": {
+      "tipo": "DB-WAX",
+      "longitud_m": 30,
+      "diametro_interno_mm": 0.32,
+      "espesor_pelicula_um": 0.25
+    },
+
+    "condiciones_operacion": {
+      "temperatura_inyector_C": 250,
+      "temperatura_detector_C": 280,
+      "caudal_gas_portador_mL_min": 1.5,
+      "gas_portador": "Helio",
+      "modo_inyeccion": "Split 1:50",
+      "volumen_inyeccion_uL": 1.0
+    },
+
+    "programa_temperatura": {
+      "temperatura_inicial_C": 50,
+      "tiempo_inicial_min": 2,
+      "rampa_1_C_min": 10,
+      "temperatura_final_C": 240,
+      "tiempo_final_min": 5
+    },
+
+    "flujos_detector_fid": {
+      "hidrogeno_mL_min": 30,
+      "aire_mL_min": 300,
+      "nitrogeno_makeup_mL_min": 25
+    },
+
+    "estandar_interno": {
+      "compuesto": "Metil heptadecanoato (C17:0 FAME)",
+      "concentracion_g_L": 1.0,
+      "tiempo_retencion_aproximado_min": 18.5
+    },
+
+    "factores_respuesta_relativos": {
+      "_nota": "Factores de respuesta relativos al estándar interno",
+      "triglicerido": 0.95,
+      "diglicerido": 0.98,
+      "monoglicerido": 1.02,
+      "fame": 1.00,
+      "glicerol": 1.15
+    }
+  },
+
+  "especificaciones_reactor": {
+    "_descripcion": "Especificaciones para reactores de laboratorio y piloto",
+
+    "reactor_laboratorio": {
+      "volumen_total_mL": 350,
+      "volumen_trabajo_mL": 280,
+      "diametro_interno_mm": 80,
+      "altura_liquido_mm": 70,
+      "material": "Vidrio borosilicato",
+      "tipo_agitador": "Magnético con barra de 30 mm"
+    },
+
+    "reactor_piloto": {
+      "volumen_total_L": 20,
+      "volumen_trabajo_L": 16,
+      "diametro_interno_mm": 270,
+      "altura_liquido_mm": 350,
+      "relacion_H_D": 1.3,
+      "material": "Acero inoxidable 316L",
+      "tipo_impelente": "Ribbon impeller",
+      "diametro_impelente_mm": 90,
+      "numero_baffles": 4,
+      "ancho_baffle_mm": 27,
+      "sistema_calefaccion": "Serpentín interno de 10 espiras"
+    }
+  },
+
+  "metricas_desempeno_modelo": {
+    "_descripcion": "Métricas estadísticas del modelo validado",
+
+    "validacion_global": {
+      "R_cuadrado_promedio": 0.9844,
+      "RMSE_promedio_pct": 3.85,
+      "MAE_promedio_pct": 3.12,
+      "numero_puntos_experimentales": 28,
+      "numero_temperaturas": 4,
+      "rango_temperaturas_C": [60, 75]
+    },
+
+    "analisis_sensibilidad": {
+      "coeficiente_sensibilidad_temperatura": 0.85,
+      "coeficiente_sensibilidad_catalizador": 0.45,
+      "coeficiente_sensibilidad_relacion_molar": 0.32,
+      "coeficiente_sensibilidad_agitacion": 0.28,
+
+      "parametro_mas_influyente": "Temperatura",
+      "parametro_menos_influyente": "Agitación"
+    }
+  },
+
+  "schema_variables": {
+    "_descripcion": "Esquema de variables para experimentos personalizados",
+
+    "variables_requeridas": [
+      {
+        "name": "temperatura_reaccion",
+        "unit": "°C",
+        "description": "Temperatura de operación del reactor",
+        "category": "condiciones_reaccion",
+        "rango_valido": [50, 80]
+      },
+      {
+        "name": "relacion_molar",
+        "unit": "mol/mol",
+        "description": "Relación molar metanol:triglicérido",
+        "category": "reactivos",
+        "rango_valido": [3, 15]
+      },
+      {
+        "name": "porcentaje_catalizador",
+        "unit": "% másico",
+        "description": "Porcentaje en masa de CaO respecto al aceite",
+        "category": "reactivos",
+        "rango_valido": [0.5, 5.0]
+      },
+      {
+        "name": "rpm_reactor",
+        "unit": "rpm",
+        "description": "Velocidad de agitación durante la reacción",
+        "category": "condiciones_reaccion",
+        "rango_valido": [200, 800]
+      },
+      {
+        "name": "tiempo_total_reaccion",
+        "unit": "min",
+        "description": "Duración total de la reacción de transesterificación",
+        "category": "condiciones_reaccion",
+        "rango_valido": [30, 180]
+      }
+    ],
+
+    "variables_opcionales_gc": [
+      {
+        "name": "area_pico_triglicerido",
+        "unit": "µV·s",
+        "description": "Área del pico cromatográfico de triglicérido",
+        "category": "analitica"
+      },
+      {
+        "name": "area_pico_fame",
+        "unit": "µV·s",
+        "description": "Área del pico cromatográfico de FAME",
+        "category": "analitica"
+      },
+      {
+        "name": "area_estandar_interno",
+        "unit": "µV·s",
+        "description": "Área del pico del estándar interno",
+        "category": "analitica"
+      },
+      {
+        "name": "tiempo_retencion",
+        "unit": "min",
+        "description": "Tiempo de retención de cada compuesto",
+        "category": "analitica"
+      }
+    ]
+  },
+
+  "referencias_bibliograficas": {
+    "kouzu_2008": {
+      "autores": "Kouzu, M., Kasuno, T., Tajika, M., Sugimoto, Y., Yamanaka, S., Hidaka, J.",
+      "titulo": "Calcium oxide as a solid base catalyst for transesterification of soybean oil and its application to biodiesel production",
+      "revista": "Fuel",
+      "volumen": 87,
+      "paginas": "2798-2806",
+      "año": 2008,
+      "doi": "10.1016/j.fuel.2007.10.019"
+    },
+
+    "perry_handbook": {
+      "titulo": "Perry's Chemical Engineers' Handbook",
+      "edicion": "9th Edition",
+      "año": 2018,
+      "editorial": "McGraw-Hill"
+    }
+  },
+
+  "licencia": {
+    "tipo": "MIT",
+    "año": 2025,
+    "autores": "J. Salas-García, M. Moran Gonzalez, M.D. Durán García, R. Romero Romero, R. Natividad Rangel",
+    "instituciones": [
+      "Facultad de Ingeniería, Universidad Autónoma del Estado de México (UAEMEX)",
+      "Centro Conjunto de Investigación en Química Sustentable UAEM–UNAM (CCIQS UAEM-UNAM)"
+    ],
+    "afiliaciones": {
+      "Salas-García, J.": "Facultad de Ingeniería, UAEMEX",
+      "Moran Gonzalez, M.": "Facultad de Ingeniería, UAEMEX",
+      "Durán García, M.D.": "Facultad de Ingeniería, UAEMEX",
+      "Romero Romero, R.": "CCIQS UAEM-UNAM",
+      "Natividad Rangel, R.": "CCIQS UAEM-UNAM"
+    }
+  }
+}
