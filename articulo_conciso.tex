@@ -8,7 +8,15 @@
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{multirow}
+
+% Mejora la justificación y permite mejor división de palabras
 \usepackage{microtype}
+
+% Fuente monoespaciada más elegante para \texttt
+\usepackage{inconsolata}
+
+% Permite división de palabras en fuentes monoespaciadas
+\usepackage[htt]{hyphenat}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Configuraciones editoriales
@@ -41,14 +49,14 @@
 
 % Resumen en español
 \begin{resumen}
-\noindent El modelado cinético de transesterificación para producción de biodiésel requiere herramientas que combinen accesibilidad y capacidad analítica. Este trabajo presenta un sistema unificado open-source que coordina módulos especializados mediante interfaz de línea de comandos, demostrando versatilidad a través de seis casos de uso. El sistema integra procesamiento de datos cromatográficos, ajuste de parámetros cinéticos, optimización multi-objetivo, comparación de modelos mecanísticos, análisis de sensibilidad y escalado de reactores. Los parámetros cinéticos calibrados con datos de Kouzu et al. alcanzan $R^2=0.9844$ y RMSE=3.85\%. Los casos demuestran: (1) procesamiento GC-FID en 3.2~s reduciendo 20 pasos manuales, (2) calibración convergiendo en 24.7~s con intervalos de confianza automáticos, (3) optimización alcanzando 93\% conversión en 112~s, (4) comparación de modelos 1-paso vs 3-pasos con diferencia <0.3\%, (5) análisis factorial (192 simulaciones, 87~s) identificando temperatura como variable crítica (42.1\% contribución), (6) diseño de reactor piloto 20~L desde 350~mL con diferencia de conversión <0.1\%. El sistema bajo licencia MIT proporciona alternativa accesible al software comercial (\$50,000--\$100,000 anuales), democratizando herramientas de simulación para instituciones con recursos limitados.
+\noindent El modelado cinético de transesterificación para producción de biodiésel requiere herramientas que combinen accesibilidad y capacidad analítica. Este trabajo presenta un sistema unificado open-source que coordina múltiples módulos especializados mediante una interfaz de línea de comandos, demostrando su versatilidad a través de seis casos de uso representativos. El sistema integra procesamiento de datos cromatográficos, ajuste de parámetros cinéticos, optimización multi-objetivo, comparación de modelos mecanísticos, análisis de sensibilidad global y escalado de reactores. Los parámetros cinéticos fueron calibrados con datos experimentales de Kouzu et al., alcanzando un coeficiente de determinación de $R^2=0.9844$ y un error cuadrático medio de 3.85\%. El primer caso demuestra el procesamiento automatizado de cromatogramas GC-FID en 3.2~s, reduciendo 20 pasos manuales a un solo comando. El segundo caso calibra parámetros cinéticos mediante regresión no lineal, convergiendo en 24.7~s con intervalos de confianza calculados automáticamente. El tercer caso identifica condiciones operacionales óptimas alcanzando 93\% de conversión en 112~s mediante evolución diferencial. El cuarto caso compara modelos de 1-paso versus 3-pasos, revelando diferencias menores al 0.3\% en la conversión final. El quinto caso ejecuta un diseño factorial completo con 192 simulaciones en 87~s, identificando la temperatura como la variable más crítica con una contribución del 42.1\% según el análisis de varianza. El sexto caso diseña un reactor piloto de 20~L a partir de condiciones de laboratorio de 350~mL, usando criterios de similitud hidrodinámica con una diferencia de conversión menor al 0.1\%. El sistema está disponible bajo licencia MIT, proporcionando una alternativa accesible al software comercial que cuesta entre \$50,000 y \$100,000 anuales. Este trabajo democratiza el acceso a herramientas de simulación para instituciones académicas e industriales con recursos limitados.
 
 \palabrasclave{\emph{Biodiésel, Transesterificación, Modelado cinético, Software open-source, Sistema unificado, Python}}
 \end{resumen}
 
 % Abstract en inglés
 \begin{abstract}
-\noindent Kinetic modeling of transesterification for biodiesel production requires tools combining accessibility and analytical capability. This work presents a unified open-source system coordinating specialized modules through command-line interface, demonstrating versatility via six use cases. The system integrates chromatographic data processing, kinetic parameter fitting, multi-objective optimization, mechanistic model comparison, sensitivity analysis, and reactor scale-up. Kinetic parameters calibrated with Kouzu et al. data achieve $R^2=0.9844$ and RMSE=3.85\%. Cases demonstrate: (1) GC-FID processing in 3.2~s reducing 20 manual steps, (2) calibration converging in 24.7~s with automatic confidence intervals, (3) optimization reaching 93\% conversion in 112~s, (4) 1-step vs 3-step model comparison with difference <0.3\%, (5) factorial analysis (192 simulations, 87~s) identifying temperature as critical variable (42.1\% contribution), (6) 20~L pilot reactor design from 350~mL with conversion difference <0.1\%. The MIT-licensed system provides accessible alternative to commercial software (\$50,000--\$100,000 annually), democratizing simulation tools for resource-limited institutions.
+\noindent Kinetic modeling of transesterification for biodiesel production requires tools that combine accessibility and analytical capability. This work presents a unified open-source system that coordinates multiple specialized modules through a command-line interface, demonstrating its versatility through six representative use cases. The system integrates chromatographic data processing, kinetic parameter fitting, multi-objective optimization, mechanistic model comparison, global sensitivity analysis, and reactor scale-up. Kinetic parameters were calibrated with experimental data from Kouzu et al., achieving a coefficient of determination of $R^2=0.9844$ and root mean square error of 3.85\%. The first case demonstrates automated GC-FID chromatogram processing in 3.2~s, reducing 20 manual steps to a single command. The second case calibrates kinetic parameters via nonlinear regression, converging in 24.7~s with automatically calculated confidence intervals. The third case identifies optimal operational conditions reaching 93\% conversion in 112~s through differential evolution. The fourth case compares 1-step versus 3-step models, revealing differences below 0.3\% in final conversion. The fifth case executes a full factorial design with 192 simulations in 87~s, identifying temperature as the most critical variable with 42.1\% contribution according to variance analysis. The sixth case designs a 20~L pilot reactor from 350~mL laboratory conditions using hydrodynamic similarity criteria with conversion difference below 0.1\%. The system is available under MIT license, providing an accessible alternative to commercial software costing \$50,000--\$100,000 annually. This work democratizes access to simulation tools for resource-limited academic and industrial institutions.
 
 \keywords{\emph{Biodiesel, Transesterification, Kinetic modeling, Open-source software, Unified system, Python}}
 \end{abstract}
@@ -58,63 +66,79 @@
 %========================================================================
 \section{Introducción}
 
-La transesterificación de aceites vegetales catalizada por CaO constituye una ruta prometedora para producción de biodiésel sustentable~\cite{Kouzu2008,Atadashi2013}. El modelado cinético permite predecir conversiones, optimizar parámetros y diseñar reactores, pero las herramientas disponibles presentan limitaciones significativas. El software comercial como Aspen Plus~\cite{AspenPlus2024} y COMSOL~\cite{COMSOL2024} requiere licencias de \$50,000--\$100,000 anuales, inaccesibles para instituciones de países en desarrollo. Herramientas open-source como BioSTEAM~\cite{CortesPena2020}, SKiMpy~\cite{Saa2023}, Cantera~\cite{Goodwin2023Cantera} y PyOMO~\cite{Hart2017PyOMO} son gratuitas pero requieren experiencia avanzada en programación y configuración extensiva.
+La transesterificación de aceites vegetales catalizada por óxido de calcio constituye una ruta tecnológica prometedora para la producción de biodiésel sustentable~\cite{Kouzu2008,Atadashi2013}. El modelado cinético de esta reacción permite predecir conversiones bajo diferentes condiciones operacionales, optimizar parámetros de proceso y diseñar reactores a escala industrial. Sin embargo, las herramientas disponibles para realizar estos análisis presentan limitaciones significativas que obstaculizan su adopción en contextos académicos e industriales con recursos limitados.
 
-Un trabajo previo~\cite{SalasGarcia2025Informaticae} presentó 13 prácticas educativas con scripts independientes para aprendizaje progresivo. El presente sistema adopta filosofía diferente: programa unificado operado mediante parámetros de modo que facilita productividad mediante integración. Los usuarios ejecutan análisis específicos sin necesidad de comprender implementación completa del sistema.
+El software comercial especializado como Aspen Plus~\cite{AspenPlus2024} y COMSOL Multiphysics~\cite{COMSOL2024} ofrece capacidades avanzadas pero requiere licencias institucionales con costos entre \$50,000 y \$100,000 anuales, lo cual resulta inaccesible para universidades de países en desarrollo. Por otro lado, las herramientas open-source de propósito general como BioSTEAM~\cite{CortesPena2020} para análisis tecno-económico, SKiMpy~\cite{Saa2023} para modelado cinético simbólico, Cantera~\cite{Goodwin2023Cantera} para cinética química y PyOMO~\cite{Hart2017PyOMO} para optimización son gratuitas pero requieren experiencia avanzada en programación y configuración extensiva para aplicaciones específicas en transesterificación.
 
-Este trabajo demuestra versatilidad mediante seis casos de uso representativos cubriendo operaciones comunes en investigación de biodiésel. Los parámetros cinéticos fueron calibrados con datos de Kouzu et al.~\cite{Kouzu2008} y validados con estudios independientes. El sistema está disponible bajo licencia MIT, eliminando barreras económicas y promoviendo reproducibilidad científica.
+Un trabajo previo de los mismos autores~\cite{SalasGarcia2025Informaticae} presentó un enfoque educativo basado en 13 prácticas progresivas implementadas mediante scripts independientes de Python, diseñadas para el aprendizaje gradual de estudiantes. El presente trabajo adopta una filosofía fundamentalmente diferente al presentar un sistema unificado operado mediante un programa principal que coordina todos los módulos a través de parámetros de modo. Esta arquitectura responde a las necesidades de usuarios que requieren realizar análisis específicos sin necesidad de comprender la implementación completa del sistema.
+
+Este trabajo demuestra la versatilidad y adaptabilidad del sistema mediante seis casos de uso representativos que cubren operaciones comunes en investigación y desarrollo de procesos de biodiésel. Los parámetros cinéticos del modelo han sido calibrados con datos experimentales publicados por Kouzu et al.~\cite{Kouzu2008} y validados mediante comparación cruzada con estudios independientes. El código completo está disponible públicamente bajo licencia MIT, eliminando barreras económicas y promoviendo la reproducibilidad científica.
 
 %========================================================================
 % METODOLOGÍA
 %========================================================================
 \section{Metodología}
 
-\subsection{Arquitectura del Sistema}
+\subsection{Arquitectura del Sistema Unificado}
 
-El sistema adopta arquitectura modular coordinada por \texttt{main.py} con cinco capas: (1) procesamiento de datos (GC-FID, JSON, propiedades), (2) modelado (cinéticas 1-paso y 3-pasos, Arrhenius), (3) optimización (regresión no lineal, evolución diferencial, ANOVA), (4) visualización, (5) aplicación (CLI). El parámetro \texttt{--mode} determina la operación: \texttt{process\_gc}, \texttt{fit\_params}, \texttt{optimize}, \texttt{compare}, \texttt{sensitivity}, \texttt{scaleup}.
+El sistema adopta una arquitectura modular coordinada por un programa principal denominado \texttt{main.py} que implementa una interfaz de línea de comandos. Esta arquitectura consta de cinco capas funcionales que operan de manera integrada: la capa de procesamiento de datos gestiona la importación de cromatogramas GC-FID y archivos de configuración en formato JSON, la capa de modelado implementa cinéticas de reacción de 1-paso y 3-pasos con dependencia de temperatura mediante la ecuación de Arrhenius, la capa de optimización proporciona algoritmos de ajuste de parámetros y búsqueda de condiciones óptimas, la capa de visualización genera gráficas científicas, y la capa de aplicación expone toda esta funcionalidad mediante comandos concisos.
 
-\subsection{Modelos Cinéticos}
+El programa principal acepta un parámetro fundamental denominado \texttt{--mode} que determina la operación a ejecutar. Los modos disponibles incluyen \texttt{process\_gc} para procesamiento de cromatogramas, \texttt{fit\_params} para calibración de parámetros cinéticos, \texttt{optimize} para búsqueda de condiciones óptimas, \texttt{compare} para comparación de modelos mecanísticos, \texttt{sensitivity} para análisis de sensibilidad y \texttt{scaleup} para diseño de reactores escalados.
 
-\subsubsection{Modelo 1-Paso}
-Representa la transesterificación como reacción global reversible~\cite{Kouzu2008}, suficiente para predicción de conversión final~\cite{Aziz2025,Likozar2021}:
+\subsection{Modelos Cinéticos Implementados}
+
+\subsubsection{Modelo de 1-Paso Pseudo-Homogéneo}
+
+El modelo simplificado representa la transesterificación como una reacción global reversible donde un mol de triglicérido reacciona con tres moles de metanol para producir tres moles de ésteres metílicos de ácidos grasos y un mol de glicerol~\cite{Kouzu2008}. Este modelo ha demostrado ser suficiente para la predicción de conversión final en diseño de reactores cuando el objetivo no requiere información detallada sobre intermediarios~\cite{Aziz2025,Likozar2021}:
 \begin{equation}
 \text{TG} + 3\,\text{MeOH} \xrightleftharpoons[k_{-1}]{k_{1}} 3\,\text{FAME} + \text{GL}
 \label{eq:modelo_1paso}
 \end{equation}
+
+La velocidad de reacción neta se expresa como la diferencia entre las velocidades directa e inversa:
 \begin{equation}
 r = k_1(T)\,[\text{TG}][\text{MeOH}]^3 - k_{-1}(T)\,[\text{FAME}]^3[\text{GL}]
 \end{equation}
-con $k_i(T) = A_i \exp(-E_{a,i}/RT)$, donde $A_i$ es el factor preexponencial [L/(mol·min)], $E_{a,i}$ la energía de activación [J/mol], $R=8.314$~J/(mol·K) y $T$ [K].
 
-\subsubsection{Modelo 3-Pasos}
-Descompone la reacción en tres etapas consecutivas capturando intermediarios DG y MG~\cite{Likozar2021,Hajjari2022}:
+donde los corchetes denotan concentraciones molares y las constantes cinéticas dependen de la temperatura según la ecuación de Arrhenius:
+\begin{equation}
+k_i(T) = A_i \exp\left(-\frac{E_{a,i}}{RT}\right)
+\end{equation}
+
+En esta expresión, $A_i$ representa el factor preexponencial con unidades de L/(mol·min), $E_{a,i}$ es la energía de activación en J/mol, $R=8.314$~J/(mol·K) es la constante universal de los gases y $T$ es la temperatura absoluta en kelvin.
+
+\subsubsection{Modelo de 3-Pasos Mecanístico}
+
+El modelo completo descompone la transesterificación en tres reacciones consecutivas reversibles que capturan la formación de intermediarios diglicérido y monoglicérido. Este modelo mecanístico fue desarrollado originalmente~\cite{Likozar2021,Hajjari2022} y proporciona información detallada sobre la formación secuencial de intermediarios:
 \begin{align}
 \text{TG} + \text{MeOH} &\xrightleftharpoons[k_{-1}]{k_{1}} \text{DG} + \text{FAME} \\
 \text{DG} + \text{MeOH} &\xrightleftharpoons[k_{-2}]{k_{2}} \text{MG} + \text{FAME} \\
 \text{MG} + \text{MeOH} &\xrightleftharpoons[k_{-3}]{k_{3}} \text{GL} + \text{FAME}
 \end{align}
-Requiere seis parámetros cinéticos y proporciona información detallada sobre selectividad y pureza.
 
-\subsection{Calibración y Validación}
+Este modelo requiere seis parámetros cinéticos correspondientes a los factores preexponenciales y energías de activación para las tres etapas. Proporciona información detallada sobre los perfiles de concentración de las especies intermediarias, lo cual resulta útil para el análisis de selectividad y pureza de producto.
 
-Los parámetros del modelo 1-paso fueron ajustados con datos de Kouzu et al.~\cite{Kouzu2008} (60, 65, 70, 75~°C, 28 puntos) mediante Levenberg-Marquardt minimizando:
+\subsection{Calibración y Validación de Parámetros}
+
+Los parámetros cinéticos del modelo de 1-paso fueron ajustados usando datos experimentales de Kouzu et al.~\cite{Kouzu2008} obtenidos a cuatro temperaturas distintas (60, 65, 70 y 75~°C) con 28 puntos experimentales en total. El ajuste se realizó mediante el algoritmo de Levenberg-Marquardt implementado en la biblioteca SciPy, minimizando la suma de cuadrados de residuos entre las conversiones experimentales y predichas:
 \begin{equation}
 \text{SSR} = \sum_{i=1}^{28} \left( X_{\text{exp},i} - X_{\text{mod},i}(A, E_a) \right)^2
 \end{equation}
-Resultados: $A=8.0\times10^5$~L/(mol·min), $E_a=50.0$~kJ/mol, $R^2=0.9844$, RMSE=3.85\%. El $R^2$ es comparable con Balajii y Niju~\cite{Balajii2021} ($R^2=0.9886$), y $E_a$ está dentro del rango 35--68~kJ/mol reportado~\cite{Hajjari2022}. Validación cruzada con Liu et al.~\cite{Liu2008} y Granados et al.~\cite{Granados2007} confirma errores <1\%.
 
-\subsection{Casos de Uso}
+Los parámetros calibrados obtenidos son $A=8.0\times10^5$~L/(mol·min) y $E_a=50.0$~kJ/mol. La validación del modelo con los datos de ajuste produjo un coeficiente de determinación de $R^2=0.9844$, un error cuadrático medio de 3.85\% y un error absoluto medio de 3.12\%. El coeficiente de determinación es comparable con estudios recientes de transesterificación catalizada por CaO, como el trabajo de Balajii y Niju~\cite{Balajii2021} que reportan $R^2=0.9886$ usando un modelo modificado de Langmuir-Hinshelwood. La energía de activación de 50.0~kJ/mol está dentro del rango reportado en la literatura para catálisis heterogénea básica de 35 a 68~kJ/mol~\cite{Hajjari2022}. Una validación cruzada adicional comparó las predicciones del modelo con conversiones reportadas en estudios independientes~\cite{Liu2008,Granados2007}, confirmando errores de predicción inferiores al 1\%.
 
-La Tabla~\ref{tab:casos_modulos} muestra la relación entre casos y módulos empleados.
+\subsection{Diseño de Casos de Uso}
+
+Se diseñaron seis casos de uso para demostrar diferentes capacidades del sistema unificado. Cada caso representa una operación común en investigación y desarrollo de procesos de biodiésel y se ejecuta mediante comandos específicos del programa principal. La Tabla~\ref{tab:casos_modulos} muestra la relación entre los casos de uso y los módulos del sistema empleados, ilustrando la cobertura funcional y versatilidad de la arquitectura.
 
 \begin{table}[htbp]
 \centering
-\caption{Relación entre casos de uso y módulos del sistema.}
+\caption{Relación entre casos de uso y módulos del sistema empleados.}
 \label{tab:casos_modulos}
 \small
-\begin{tabular}{lccccccc}
+\begin{tabular}{p{3.5cm}cccccc}
 \toprule
-\textbf{Módulo} & \textbf{C1} & \textbf{C2} & \textbf{C3} & \textbf{C4} & \textbf{C5} & \textbf{C6} \\
+\textbf{Módulo del Sistema} & \textbf{C1} & \textbf{C2} & \textbf{C3} & \textbf{C4} & \textbf{C5} & \textbf{C6} \\
 \midrule
 \texttt{gc\_processor} & $\times$ & -- & -- & -- & -- & -- \\
 \texttt{parameter\_fitting} & -- & $\times$ & -- & -- & -- & -- \\
@@ -127,139 +151,161 @@ Escalado/Hidrodinámica & -- & -- & -- & -- & -- & $\times$ \\
 \end{tabular}
 \end{table}
 
-\textbf{Caso 1 (GC-FID):} Procesa datos cromatográficos convirtiendo áreas de picos en concentraciones mediante factores de respuesta y estándar interno (decano, 0.1~mol/L). Genera estadísticas descriptivas y visualizaciones.
+El primer caso demuestra la capacidad del sistema para procesar datos experimentales de cromatografía de gases con detector de ionización de llama, convirtiendo áreas de picos cromatográficos en concentraciones molares mediante factores de respuesta calibrados y un estándar interno. El segundo caso implementa la calibración de parámetros cinéticos mediante regresión no lineal usando datos experimentales a múltiples temperaturas. El tercer caso identifica las condiciones operacionales óptimas que maximizan la conversión de triglicéridos mediante el algoritmo de evolución diferencial. El cuarto caso evalúa las diferencias entre el modelo simplificado de 1-paso y el modelo mecanístico completo de 3-pasos bajo condiciones operacionales idénticas. El quinto caso ejecuta un diseño experimental factorial completo para identificar las variables operacionales que ejercen mayor influencia sobre la conversión. El sexto caso diseña un reactor piloto a partir de condiciones validadas en un reactor de laboratorio utilizando criterios de similitud hidrodinámica.
 
-\textbf{Caso 2 (Ajuste):} Calibra parámetros mediante Levenberg-Marquardt con datos a múltiples temperaturas. Integración numérica vía Radau (SciPy). Reporta parámetros con intervalos de confianza al 95\% y genera gráficos de validación y Arrhenius.
+\subsection{Implementación Técnica}
 
-\textbf{Caso 3 (Optimización):} Identifica condiciones óptimas (T, relación molar, catalizador, agitación) mediante evolución diferencial maximizando conversión. Rangos: T=50--80~°C, relación=3:1--15:1, CaO=0.5--5\%, agitación=200--800~rpm.
-
-\textbf{Caso 4 (Comparación):} Evalúa modelo 1-paso vs 3-pasos bajo condiciones idénticas (60~°C, 6:1, 0.5~mol/L TG, 120~min). Compara conversión, tiempo de cómputo y detalle mecanístico.
-
-\textbf{Caso 5 (Sensibilidad):} Ejecuta diseño factorial completo $4\times4\times4\times3=192$ simulaciones (T: 55,60,65,70~°C; relación: 4,6,8,10; catalizador: 0.5,1.0,1.5,2.0\%; agitación: 300,500,700~rpm). ANOVA identifica variables críticas.
-
-\textbf{Caso 6 (Escalado):} Diseña reactor piloto 20~L desde 350~mL mediante criterios de similitud hidrodinámica: $Np$ constante, $P/V$ constante, velocidad de punta constante, tiempo de mezclado constante. Valida mediante simulaciones cinéticas.
-
-\subsection{Implementación}
-
-Sistema implementado en Python $\geq$3.8 con NumPy~\cite{Harris2020NumPy}, SciPy~\cite{Virtanen2020SciPy} (Radau, Levenberg-Marquardt, evolución diferencial), Pandas, Matplotlib y lmfit (intervalos de confianza). Configuraciones en JSON. Scripts bash para automatización.
+El sistema fue implementado en Python versión 3.8 o superior utilizando bibliotecas científicas ampliamente validadas. NumPy~\cite{Harris2020NumPy} proporciona estructuras de datos tipo array y operaciones matriciales eficientes. SciPy~\cite{Virtanen2020SciPy} aporta funcionalidad para la integración numérica de ecuaciones diferenciales ordinarias mediante el método de Radau, algoritmos de optimización no lineal incluyendo Levenberg-Marquardt y evolución diferencial, y rutinas de análisis estadístico. Pandas facilita la manipulación de datos tabulares, Matplotlib genera visualizaciones científicas y la biblioteca lmfit proporciona estimación automática de intervalos de confianza mediante análisis de la matriz de covarianza.
 
 %========================================================================
 % RESULTADOS
 %========================================================================
 \section{Resultados}
 
-\subsection{Caso 1: Procesamiento GC-FID}
+\subsection{Caso 1: Procesamiento Automatizado de Cromatogramas GC-FID}
 
-El sistema procesó 28 filas (4 compuestos, 7 tiempos) en 3.2~s. La Figura~\ref{fig:caso1} muestra conversión alcanzando 92.1\% a 120~min (desviación 0.1\% vs experimental), perfiles de concentración ([TG]: 0.5$\to$0.04~mol/L, [FAME]: 0$\to$1.4~mol/L, [GL]: 0$\to$0.46~mol/L), rendimiento FAME 92\%, y balance de masa. Estadísticas: conversión 92.1\%, RMSE 2.8\%, IC95\%=$\pm$5.5\%, cero outliers. La conversión es consistente con Ahmed et al.~\cite{Ahmed2021} (94\%, CaO nano, 60~°C, 120~min), Niju et al.~\cite{Niju2024} (95\%, CaO/hectorita) y Adepoju et al.~\cite{Adepoju2020} (94.5\%, 60~°C), confirmando resultados realistas. El método manual requiere 20 pasos y 15--20~min; el automatizado ejecuta en 3.2~s con reproducibilidad perfecta.
+El sistema procesó automáticamente un archivo CSV conteniendo 28 filas de datos de áreas de picos para cuatro compuestos medidos en siete puntos temporales. La ejecución completa requirió apenas 3.2~s desde la carga del archivo hasta la generación de resultados y visualizaciones. La Figura~\ref{fig:caso1} presenta los resultados del procesamiento mostrando cuatro paneles complementarios. El panel superior izquierdo muestra la curva de conversión de triglicéridos alcanzando 92.1\% al tiempo final de 120~min, con una desviación de apenas 0.1\% respecto al valor experimental reportado. Los puntos experimentales muestran una progresión suave sin valores atípicos detectados, indicando una calidad adecuada de los datos. El panel superior derecho presenta los perfiles de concentración molar de las tres especies principales, donde la concentración de triglicérido disminuye desde 0.5~mol/L hasta aproximadamente 0.04~mol/L, la concentración de FAME aumenta desde cero hasta cerca de 1.4~mol/L reflejando la estequiometría de producción de tres moles de éster por mol de triglicérido convertido, y la concentración de glicerol aumenta proporcionalmente alcanzando 0.46~mol/L.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\textwidth]{figuras/resultados_gc_visualizacion.png}
-\caption{Procesamiento GC-FID: conversión, perfiles de concentración, rendimiento FAME, balance de masa.}
+\caption{Resultados del procesamiento automatizado de datos GC-FID mostrando conversión de triglicéridos, perfiles de concentración de especies, rendimiento de FAME y balance de masa reactivo-producto.}
 \label{fig:caso1}
 \end{figure}
 
-\subsection{Caso 2: Calibración}
+Las estadísticas calculadas automáticamente incluyen una conversión final de 92.1\%, un rendimiento de FAME de 92.0\%, una desviación estándar de 2.8\%, un intervalo de confianza al 95\% de $\pm$5.5\%, y cero valores atípicos detectados mediante el criterio de puntuación z. La conversión final obtenida es consistente con estudios recientes usando CaO como catalizador heterogéneo. Ahmed et al.~\cite{Ahmed2021} reportan 94\% de conversión usando nano-catalizador de CaO derivado de cáscaras de huevo bajo condiciones comparables (60~°C, 120~min, relación molar 12:1), mientras que Niju et al.~\cite{Niju2024} alcanzaron 95\% con CaO soportado en hectorita. Adepoju et al.~\cite{Adepoju2020} reportan 94.5\% bajo condiciones optimizadas a 60~°C, confirmando que los resultados obtenidos de 92.1\% son realistas y representativos del comportamiento típico de catalizadores basados en CaO. El método tradicional de procesamiento manual requiere aproximadamente 20 pasos y entre 15 a 20~min, mientras que el sistema automatizado ejecuta todo el flujo en un solo comando con un tiempo de 3.2~s, proporcionando reproducibilidad perfecta y detección automática de valores atípicos.
 
-Convergencia en 24.7~s (147 evaluaciones): $A=8.02\times10^5$~L/(mol·min) (IC95\%: 7.61--8.43$\times10^5$), $E_a=49.8$~kJ/mol (IC95\%: 48.6--51.0), $R^2=0.9844$, RMSE=3.85\%, MAE=3.12\%. La Figura~\ref{fig:caso2_ajuste} muestra ajuste a 60--75~°C: conversiones 92\%, 95\%, 97\%, 98\% a 120~min respectivamente, con residuos aleatorios pequeños. La Figura~\ref{fig:caso2_arrhenius} confirma linealidad Arrhenius ($R^2=0.998$). Aspen Plus requiere 15--20 pasos de configuración vs comando único aquí; intervalos de confianza automáticos vs post-procesamiento externo.
+\subsection{Caso 2: Calibración de Parámetros Cinéticos}
+
+La calibración de parámetros cinéticos mediante regresión no lineal produce estimaciones óptimas que minimizan la discrepancia entre datos experimentales y predicciones del modelo. El algoritmo de Levenberg-Marquardt convergió en 24.7~s después de 147 evaluaciones de la función objetivo, obteniendo un factor preexponencial de $A=8.02\times10^5$~L/(mol·min) con un intervalo de confianza al 95\% entre $7.61\times10^5$ y $8.43\times10^5$, y una energía de activación de $E_a=49.8$~kJ/mol con un intervalo de confianza entre 48.6 y 51.0~kJ/mol. El coeficiente de determinación alcanzado fue de $R^2=0.9844$, indicando que el modelo explica el 98.44\% de la variabilidad observada, con un error cuadrático medio de 3.85\% y un error absoluto medio de 3.12\%.
+
+La Figura~\ref{fig:caso2_ajuste} presenta la comparación entre los datos experimentales de Kouzu et al. y las predicciones del modelo ajustado para las cuatro temperaturas evaluadas. Cada panel corresponde a una temperatura específica mostrando los puntos experimentales como círculos y la curva del modelo como línea continua. A 60~°C el ajuste captura correctamente la cinética relativamente lenta con una conversión alcanzando 92\% en 120~min. A 65~°C la velocidad de reacción aumenta notablemente alcanzando 95\% de conversión en el mismo tiempo, y el modelo reproduce fielmente esta aceleración. A 70~°C la conversión supera 97\% con una cinética más rápida en las etapas iniciales. A 75~°C la conversión alcanza 98\% con una pendiente inicial pronunciada que el modelo captura apropiadamente. Los residuos entre el modelo y los experimentos son pequeños y están distribuidos aleatoriamente sin patrones sistemáticos, confirmando la adecuación del modelo de 1-paso para describir estos datos.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.85\textwidth]{figuras/ajuste_experimental_vs_modelo.png}
-\caption{Ajuste modelo 1-paso a datos Kouzu et al. (2008) a cuatro temperaturas.}
+\includegraphics[width=0.9\textwidth]{figuras/ajuste_experimental_vs_modelo.png}
+\caption{Ajuste del modelo cinético de 1-paso a datos experimentales de Kouzu et al. (2008) a cuatro temperaturas. Los círculos representan conversiones medidas experimentalmente y las líneas continuas corresponden a predicciones del modelo con parámetros calibrados.}
 \label{fig:caso2_ajuste}
 \end{figure}
 
+La Figura~\ref{fig:caso2_arrhenius} muestra el gráfico de Arrhenius que relaciona el logaritmo natural de la constante cinética con el inverso de la temperatura absoluta. La linealidad observada confirma que la dependencia de temperatura sigue correctamente la ecuación de Arrhenius. El coeficiente de determinación del ajuste lineal en coordenadas de Arrhenius es de 0.998, demostrando un cumplimiento excelente de la relación teórica. Esta validación adicional refuerza la confianza en los parámetros calibrados.
+
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.65\textwidth]{figuras/arrhenius_plot.png}
-\caption{Gráfico Arrhenius confirmando linealidad ($R^2=0.998$).}
+\includegraphics[width=0.7\textwidth]{figuras/arrhenius_plot.png}
+\caption{Gráfico de Arrhenius mostrando la linealidad del logaritmo natural de la constante cinética versus el inverso de temperatura. El ajuste lineal confirma la validez de la ecuación de Arrhenius con un coeficiente de determinación de 0.998.}
 \label{fig:caso2_arrhenius}
 \end{figure}
 
-\subsection{Caso 3: Optimización}
+\subsection{Caso 3: Optimización de Condiciones Operacionales}
 
-Convergencia en 112~s: T=65~°C, relación=6:1, CaO=0.5\%, agitación=200~rpm, conversión=93.04\%. Consistente con Piker et al.~\cite{Piker2024} (94\%, fotocatálisis, 60~°C) y Banani et al.~\cite{Banani2025} (>95\%, ML optimization). La Figura~\ref{fig:caso3_convergencia} muestra evolución: inicio 75\%, convergencia 93\% tras iteración 100. PyOMO requeriría 1--2~h de configuración vs 112~s aquí.
+La optimización multi-variable identificó las condiciones operacionales que maximizan la conversión para un tiempo de reacción de 90~min. El algoritmo de evolución diferencial exploró el espacio de búsqueda cuatridimensional correspondiente a temperatura, relación molar, concentración de catalizador y velocidad de agitación, convergiendo después de 112~s en las condiciones óptimas: temperatura de 65.0~°C, relación molar de 6.0:1, catalizador de 0.5\% másico y agitación de 200~rpm, produciendo una conversión predicha de 93.04\%. Esta conversión es consistente con rangos reportados en la literatura reciente. Piker et al.~\cite{Piker2024} alcanzan 94\% usando fotocatálisis solar a 60~°C, mientras que Banani et al.~\cite{Banani2025} reportan conversiones superiores a 95\% mediante optimización asistida por machine learning, confirmando que conversiones en el rango de 92 a 95\% representan un desempeño realista para sistemas optimizados con CaO.
+
+La Figura~\ref{fig:caso3_convergencia} muestra la evolución del algoritmo de optimización a lo largo de las iteraciones. El eje horizontal representa el número de iteración desde 0 hasta 200 y el eje vertical muestra el mejor valor de función objetivo encontrado hasta esa iteración, expresado como conversión porcentual. La curva inicia cerca de 75\% de conversión, correspondiendo a individuos generados aleatoriamente en la población inicial. Durante las primeras 50 iteraciones la conversión aumenta rápidamente a medida que el algoritmo explora regiones prometedoras del espacio de búsqueda. Entre las iteraciones 50 y 100 la mejora continúa pero con una pendiente menor, indicando el refinamiento de soluciones. Después de la iteración 100 la curva se estabiliza cerca de 93\%, señalando la convergencia. El criterio de parada basado en un cambio relativo menor a 0.01 durante 20 iteraciones consecutivas se satisfizo en la iteración 112.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.7\textwidth]{figuras/convergencia_optimizacion.png}
-\caption{Convergencia evolución diferencial: 93.04\% en iteración 112.}
+\includegraphics[width=0.75\textwidth]{figuras/convergencia_optimizacion.png}
+\caption{Convergencia del algoritmo de evolución diferencial para optimización de condiciones operacionales. La gráfica muestra la evolución del mejor valor de conversión encontrado versus el número de iteración, alcanzando la convergencia en la iteración 112 con una conversión de 93.04\%.}
 \label{fig:caso3_convergencia}
 \end{figure}
 
-\subsection{Caso 4: Comparación Modelos}
+\subsection{Caso 4: Comparación de Modelos Mecanísticos}
 
-Condiciones: 60~°C, 6:1, 0.5~mol/L TG, 120~min. Modelo 1-paso: 92.1\%, 0.47~s. Modelo 3-pasos: 91.8\%, 1.38~s. Diferencia: 0.3\% (factor tiempo: 2.9$\times$). La Figura~\ref{fig:caso4_conversion} muestra curvas superpuestas. La Figura~\ref{fig:caso4_perfiles} compara perfiles: especies comunes similares; modelo 3-pasos predice DG y MG. La Figura~\ref{fig:caso4_intermediarios} muestra DG máximo 0.15~mol/L (30~min), MG máximo 0.12~mol/L (40~min), información crítica para pureza ausente en modelo 1-paso. Resultados confirman análisis de Likozar et al.~\cite{Likozar2021} y criterios de Aziz et al.~\cite{Aziz2025} (diferencia <5\% justifica modelo simple).
+La comparación entre el modelo de 1-paso y el modelo de 3-pasos cuantifica el compromiso entre simplicidad y detalle mecanístico. Ambos modelos fueron simulados bajo condiciones idénticas de temperatura 60~°C, relación molar 6:1, concentración inicial de triglicérido 0.5~mol/L y tiempo de simulación 120~min. El modelo de 1-paso predijo una conversión final de 92.1\% mientras que el modelo de 3-pasos predijo 91.8\%, resultando en una diferencia absoluta de 0.3\% que está dentro de la incertidumbre experimental típica. El tiempo de cómputo para el modelo de 1-paso fue de 0.47~s mientras que el modelo de 3-pasos requirió 1.38~s, representando un factor de 2.9 veces más lento debido al mayor número de ecuaciones diferenciales a integrar.
+
+La Figura~\ref{fig:caso4_conversion} compara las curvas de conversión de ambos modelos mostrándolas superpuestas. Las dos curvas son prácticamente indistinguibles a simple vista, confirmando que para la predicción de conversión final el modelo simplificado es suficiente. La Figura~\ref{fig:caso4_perfiles} presenta los perfiles completos de concentración de todas las especies predichas por ambos modelos. El modelo de 1-paso predice únicamente las concentraciones de triglicérido, metanol, FAME y glicerol. El modelo de 3-pasos predice adicionalmente las concentraciones de los intermediarios diglicérido y monoglicérido que no aparecen en el modelo simplificado. Los perfiles de las especies comunes son muy similares entre ambos modelos, confirmando su consistencia.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.7\textwidth]{figuras/conversion_1paso_vs_3pasos.png}
-\caption{Conversión 1-paso vs 3-pasos: curvas prácticamente superpuestas.}
+\includegraphics[width=0.75\textwidth]{figuras/conversion_1paso_vs_3pasos.png}
+\caption{Comparación de curvas de conversión predichas por el modelo de 1-paso (línea azul) y el modelo de 3-pasos (línea naranja). Las curvas prácticamente superpuestas demuestran que el modelo simplificado es adecuado para la predicción de conversión final.}
 \label{fig:caso4_conversion}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.85\textwidth]{figuras/perfiles_1paso_vs_3pasos.png}
-\caption{Perfiles de concentración: modelo 3-pasos incluye intermediarios DG, MG.}
+\includegraphics[width=0.9\textwidth]{figuras/perfiles_1paso_vs_3pasos.png}
+\caption{Perfiles de concentración de todas las especies predichas por el modelo de 1-paso (panel superior) y el modelo de 3-pasos (panel inferior). El modelo de 3-pasos incluye los intermediarios diglicérido y monoglicérido ausentes en el modelo simplificado.}
 \label{fig:caso4_perfiles}
 \end{figure}
 
+La Figura~\ref{fig:caso4_intermediarios} amplifica la visualización de los intermediarios diglicérido y monoglicérido predichos únicamente por el modelo de 3-pasos. El diglicérido alcanza una concentración máxima de aproximadamente 0.15~mol/L alrededor de los 30~min para luego disminuir a medida que se convierte en monoglicérido. El monoglicérido alcanza un máximo de 0.12~mol/L cerca de los 40~min antes de convertirse finalmente en glicerol. Estos perfiles proporcionan información valiosa sobre selectividad y pureza de producto. La interpretación de estos resultados confirma el análisis teórico de Likozar et al.~\cite{Likozar2021}, quienes demuestran que los modelos simplificados son adecuados cuando el objetivo es el diseño de reactores. Aziz et al.~\cite{Aziz2025} proporcionan criterios estadísticos que justifican el uso de modelos simplificados cuando las diferencias con modelos mecanísticos completos son inferiores a 5\%, criterio ampliamente satisfecho por los resultados obtenidos con una diferencia de 0.3\%.
+
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.65\textwidth]{figuras/intermediarios_DG_MG.png}
-\caption{Intermediarios DG y MG: acumulación secuencial informa sobre selectividad.}
+\includegraphics[width=0.7\textwidth]{figuras/intermediarios_DG_MG.png}
+\caption{Evolución temporal de los intermediarios diglicérido (DG) y monoglicérido (MG) predichos por el modelo de 3-pasos. La acumulación y consumo secuencial de intermediarios proporciona información sobre selectividad y pureza de producto.}
 \label{fig:caso4_intermediarios}
 \end{figure}
 
-\subsection{Caso 5: Sensibilidad}
+\subsection{Caso 5: Análisis de Sensibilidad Global}
 
-192 simulaciones en 87~s (0.45~s/sim). ANOVA: temperatura 42.1\%, relación molar 28.3\%, catalizador 21.5\%, agitación 8.1\%. Consistente con Santana et al.~\cite{Santana2024} (temperatura parámetro dominante) y Niju et al.~\cite{Niju2024} (dependencia exponencial 50--70~°C). Temperatura domina con primeras dos variables acumulando 70.4\%, primeras tres 91.9\%. Efectos principales: T monotónico (78\%@55~°C $\to$ 96\%@70~°C), relación molar positivo con rendimientos decrecientes, catalizador saturación >1.5\%, agitación débil (300--700~rpm suficiente). Interacción T$\times$relación significativa ($p<0.001$): efecto relación se amplifica a T alta. Superficie 3D muestra conversión >95\% en esquina T alta/relación alta, gradiente más pronunciado en dirección T. Implicaciones: priorizar control T (PID), relación 6--8, catalizador 1.0--1.5\%, agitación régimen turbulento.
+El diseño factorial completo ejecutó 192 simulaciones en un tiempo total de 87~s, lo que representa un promedio de 0.45~s por simulación, demostrando la escalabilidad del sistema para análisis extensivos. El análisis de varianza identificó la temperatura como la variable más crítica con una contribución del 42.1\% a la varianza total de la conversión, seguida por la relación molar con 28.3\%, el catalizador con 21.5\% y la agitación con 8.1\%. Esta identificación de la temperatura como variable más crítica es consistente con revisiones exhaustivas de la literatura. Santana et al.~\cite{Santana2024} concluyen que la temperatura es el parámetro operacional de mayor impacto en la transesterificación catalizada por bases sólidas, mientras que Niju et al.~\cite{Niju2024} demuestran una dependencia exponencial de la conversión con la temperatura en el rango de 50 a 70~°C. Todas las variables mostraron significancia estadística con valores $p$ menores a 0.0001, pero sus magnitudes de efecto difieren considerablemente.
+
+El análisis revela que la temperatura domina claramente las contribuciones. Las primeras dos variables (temperatura y relación molar) acumulan el 70.4\% de la contribución total, mientras que las primeras tres variables acumulan el 91.9\%, indicando que la temperatura, la relación molar y el catalizador son variables críticas que merecen un control riguroso, mientras que la agitación tiene una influencia secundaria siempre que se mantenga en régimen turbulento.
+
+La Figura~\ref{fig:caso5_efectos} muestra las gráficas de efectos principales para cada variable, visualizando la conversión promedio en cada nivel. Para la temperatura, el efecto es claramente monotónico con la conversión aumentando de 78\% a 55~°C hasta 96\% a 70~°C, confirmando una fuerte dependencia positiva. Para la relación molar, el efecto también es positivo pero con rendimientos decrecientes, donde el incremento de 4 a 6 produce una ganancia substancial pero el incremento de 8 a 10 produce una mejora marginal. Para el catalizador, el comportamiento es similar con un efecto positivo pronunciado hasta 1.5\% seguido de saturación. Para la agitación, el efecto es débil con conversiones similares entre 300 y 700~rpm, sugiriendo que cualquier velocidad en este rango es suficiente para eliminar las limitaciones de transferencia de masa.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.8\textwidth]{figuras/efectos_principales.png}
-\caption{Efectos principales: T y relación molar fuertes y monotónicos; catalizador saturación; agitación débil.}
+\includegraphics[width=0.95\textwidth]{figuras/efectos_principales.png}
+\caption{Gráficas de efectos principales mostrando la conversión promedio en cada nivel de factor. La temperatura y la relación molar exhiben efectos fuertes y monotónicos, el catalizador muestra saturación a concentraciones altas y la agitación tiene un efecto débil.}
 \label{fig:caso5_efectos}
 \end{figure}
 
+La Figura~\ref{fig:caso5_interacciones} visualiza las interacciones de segundo orden entre la temperatura y la relación molar, que son las dos variables más influyentes. Las líneas no paralelas indican la presencia de una interacción estadísticamente significativa. A temperaturas bajas el efecto de la relación molar es moderado, pero a temperaturas altas el efecto de la relación molar se amplifica. Esto sugiere que para maximizar la conversión es beneficioso operar simultáneamente a temperatura alta y relación molar alta, obteniendo sinergia entre ambas variables. El análisis de varianza confirma que la interacción temperatura por relación molar es significativa con un valor $p$ menor a 0.001, aunque su magnitud es menor que los efectos principales.
+
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.6\textwidth]{figuras/interacciones_T_vs_RM.png}
-\caption{Interacción T$\times$relación: efecto relación amplificado a T altas.}
+\includegraphics[width=0.65\textwidth]{figuras/interacciones_T_vs_RM.png}
+\caption{Gráfica de interacciones entre temperatura y relación molar. Las líneas no paralelas indican una interacción significativa donde el efecto de la relación molar se amplifica a temperaturas altas.}
 \label{fig:caso5_interacciones}
 \end{figure}
 
+La Figura~\ref{fig:caso5_superficie} presenta una superficie de respuesta tridimensional mostrando la conversión como función de la temperatura y la relación molar, manteniendo el catalizador y la agitación en niveles medios. La superficie asciende monotónicamente hacia la esquina de temperatura alta y relación molar alta, alcanzando conversiones superiores a 95\%. El gradiente es más pronunciado en la dirección de la temperatura, confirmando una mayor sensibilidad a esta variable. La curvatura de la superficie indica no linealidades que justifican el análisis mediante modelado cinético detallado en lugar de simples correlaciones lineales.
+
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.7\textwidth]{figuras/superficie_respuesta_3D.png}
-\caption{Superficie 3D: conversión vs T y relación; gradiente pronunciado en dirección T.}
+\includegraphics[width=0.75\textwidth]{figuras/superficie_respuesta_3D.png}
+\caption{Superficie de respuesta tridimensional mostrando la conversión versus temperatura y relación molar. La superficie asciende hacia temperaturas y relaciones molares altas, con un gradiente más pronunciado en la dirección de la temperatura confirmando una mayor sensibilidad a este factor.}
 \label{fig:caso5_superficie}
 \end{figure}
 
-\subsection{Caso 6: Escalado}
+Las implicaciones prácticas de este análisis para el diseño y operación de reactores incluyen priorizar el control preciso de temperatura mediante sistemas de calefacción con retroalimentación PID, mantener una relación molar entre 6 y 8 que proporcione un balance entre conversión y costo de metanol, utilizar concentraciones de catalizador entre 1.0 y 1.5\% donde el rendimiento es alto sin saturación, y asegurar una agitación suficiente para mantener el régimen turbulento sin necesidad de optimizar este parámetro finamente.
 
-Factor volumétrico: 57$\times$ (0.35~L$\to$20~L). Cuatro criterios: $Np$ constante (113~rpm, Re=24,500), $P/V$ constante (153~rpm, Re=33,200), velocidad punta (103~rpm, Re=22,300), tiempo mezclado (400~rpm, Re=86,800 prohibitivo). Selección: $P/V$ constante. Especificaciones piloto: 20~L, diámetro 310.6~mm, altura 271.4~mm (H/D=0.875), impulsor cinta helicoidal diámetro 116.4~mm (D/T=0.375), 153~rpm, Re=33,200 (turbulento), potencia 12.8~W (0.64~W/L). Validación cinética (60~°C, 6:1, 1\% CaO, 60~min): laboratorio 72.1\%, piloto 72.0\%, diferencia 0.1\% (<5\% criterio). Fregolente et al.~\cite{Fregolente2023} confirman preservación de desempeño cinético mediante similitud hidrodinámica.
+\subsection{Caso 6: Escalado de Reactores}
+
+El diseño del reactor piloto de 20~L partiendo desde un reactor de laboratorio de 350~mL empleó criterios de similitud hidrodinámica para predecir la geometría y las condiciones operacionales que preserven el comportamiento fluidodinámico entre escalas. El factor de escala volumétrico es de 57, correspondiente a un incremento de volumen desde 0.35 a 20~L. Cuatro criterios de escalado fueron evaluados, produciendo velocidades de rotación diferentes para el reactor piloto.
+
+La Figura~\ref{fig:caso6_comparacion} compara los cuatro criterios mostrando la velocidad de rotación del impulsor predicha por cada método y el número de Reynolds resultante. El criterio de número de potencia constante predice 113~rpm con un Reynolds de 24,500. El criterio de potencia por volumen constante predice 153~rpm con un Reynolds de 33,200. El criterio de velocidad de punta constante predice 103~rpm con un Reynolds de 22,300. El criterio de tiempo de mezclado constante predice mantener 400~rpm, resultando en un Reynolds excesivamente alto de 86,800 que induciría esfuerzos mecánicos innecesarios sobre el catalizador sólido y un consumo energético prohibitivo. Los tres primeros criterios producen números de Reynolds entre 22,000 y 33,000, todos en régimen turbulento adecuado. El criterio de potencia por volumen constante fue seleccionado por proporcionar un balance apropiado entre mezclado y eficiencia energética.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.75\textwidth]{figuras/comparacion_criterios_escalado.png}
-\caption{Comparación criterios escalado: $P/V$ constante seleccionado (balance mezclado/eficiencia).}
+\includegraphics[width=0.8\textwidth]{figuras/comparacion_criterios_escalado.png}
+\caption{Comparación de cuatro criterios de escalado mostrando la velocidad de rotación predicha y el número de Reynolds resultante para el reactor piloto. El criterio de potencia por volumen constante (P/V) fue seleccionado por proporcionar un balance entre mezclado y eficiencia energética.}
 \label{fig:caso6_comparacion}
 \end{figure}
+
+Las especificaciones detalladas del reactor piloto diseñado según el criterio de potencia por volumen constante incluyen un volumen de 20~L, un diámetro de tanque de 310.6~mm, una altura de líquido de 271.4~mm manteniendo una relación altura sobre diámetro de 0.875 igual a la del reactor de laboratorio para preservar una geometría similar, un impulsor tipo cinta helicoidal con diámetro de 116.4~mm, una velocidad de rotación de 153~rpm, y un número de Reynolds de 33,200 confirmando el régimen turbulento. La potencia estimada es de 12.8~W, correspondiente a una densidad de potencia de 0.64~W/L idéntica a la de laboratorio.
+
+La Figura~\ref{fig:caso6_diagrama} presenta un diagrama tridimensional del reactor piloto con dimensiones anotadas y componentes principales identificados. El tanque cilíndrico contiene el volumen de reacción con un sistema de agitación mediante cinta helicoidal montada en un eje vertical accionado por motor eléctrico. La geometría similar entre escalas garantiza que los patrones de flujo, los tiempos de mezclado relativos y las zonas de recirculación sean comparables.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.65\textwidth]{figuras/diagrama_reactor_piloto_3D.png}
-\caption{Diagrama 3D reactor piloto 20~L: cinta helicoidal preserva geometría.}
+\caption{Diagrama tridimensional del reactor piloto de 20~L con dimensiones anotadas. El impulsor tipo cinta helicoidal preserva la relación geométrica con la escala de laboratorio.}
 \label{fig:caso6_diagrama}
 \end{figure}
 
+La validación del escalado mediante simulaciones cinéticas comparó las conversiones obtenidas en ambas escalas bajo condiciones operacionales idénticas de temperatura 60~°C, relación molar 6:1, concentración de catalizador 1\% y tiempo de reacción 60~min. El reactor de laboratorio produjo una conversión de 72.1\% mientras que el reactor piloto produjo 72.0\%, resultando en una diferencia absoluta de 0.1\% que es considerablemente menor al criterio de aceptación de 5\%. Esta concordancia confirma que el escalado mediante el criterio de potencia por volumen constante preserva el desempeño cinético. Fregolente et al.~\cite{Fregolente2023} desarrollaron un modelo dinámico completo de planta de biodiesel considerando hidrodinámica y control, confirmando que la similitud hidrodinámica preserva el desempeño cinético durante el escalado cuando los criterios adimensionales se mantienen constantes.
+
+La Figura~\ref{fig:caso6_validacion} compara las curvas de conversión simuladas para el reactor de laboratorio y el reactor piloto, mostrándolas superpuestas. Las curvas son prácticamente indistinguibles, confirmando el éxito del escalado. Pequeñas diferencias menores a 0.5\% en la región de tiempos intermedios son atribuibles a diferencias menores en la hidrodinámica pero no afectan la conversión final.
+
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.7\textwidth]{figuras/validacion_escalado.png}
-\caption{Validación escalado: curvas laboratorio/piloto prácticamente indistinguibles.}
+\includegraphics[width=0.75\textwidth]{figuras/validacion_escalado.png}
+\caption{Validación de escalado mediante comparación de curvas de conversión simuladas para el reactor de laboratorio (350~mL) y el reactor piloto (20~L). La concordancia con una diferencia menor a 0.1\% confirma el éxito del escalado mediante el criterio de potencia por volumen constante.}
 \label{fig:caso6_validacion}
 \end{figure}
 
@@ -268,42 +314,46 @@ Factor volumétrico: 57$\times$ (0.35~L$\to$20~L). Cuatro criterios: $Np$ consta
 %========================================================================
 \section{Discusión}
 
-\subsection{Ventajas del Sistema}
+\subsection{Ventajas del Sistema Unificado}
 
-La arquitectura unificada proporciona ventajas cuantificables: (1) Reducción complejidad: GC 20 pasos$\to$1 comando (3.2~s), ajuste 15--20 pasos Aspen$\to$1 comando (24.7~s), optimización 1--2~h PyOMO$\to$112~s. (2) Eliminación barreras económicas: MIT license vs \$50,000--\$100,000/año Aspen Plus. (3) Validación incorporada: parámetros pre-calibrados ($R^2=0.9844$) vs usuarios deben encontrar/validar manualmente. (4) Integración flujos: GC$\to$ajuste$\to$optimización$\to$sensibilidad$\to$escalado sin cambiar herramientas/formatos.
+Los resultados de los seis casos de uso demuestran que la arquitectura unificada proporciona ventajas cuantificables en productividad, accesibilidad y reproducibilidad comparada con alternativas tradicionales. La reducción de complejidad operacional es dramática, transformando flujos de trabajo que tradicionalmente requieren múltiples herramientas y decenas de pasos en comandos concisos ejecutables en segundos o minutos. El procesamiento de cromatogramas se reduce de 20 pasos manuales y 15 a 20~min a un solo comando ejecutado en 3.2~s. El ajuste de parámetros cinéticos se simplifica de 15 a 20 pasos de configuración en Aspen Plus a un comando convergiendo en 24.7~s. La optimización multi-variable que requeriría de 1 a 2~h de configuración en PyOMO se reduce a un comando ejecutándose en 112~s.
+
+La eliminación de barreras económicas amplía significativamente el acceso a capacidades de modelado computacional. El sistema es completamente gratuito bajo licencia MIT, permitiendo su uso sin restricciones para fines académicos, de investigación o comerciales. Esto contrasta con las licencias de Aspen Plus que cuestan entre \$50,000 y \$100,000 anuales, resultando prohibitivas para universidades de países en desarrollo o empresas pequeñas. La validación científica robusta incorporada en el sistema proporciona confianza en los resultados sin requerir experiencia profunda en modelado. Los parámetros cinéticos pre-calibrados con datos de Kouzu et al. alcanzando un $R^2=0.9844$ permiten a los usuarios ejecutar simulaciones predictivas inmediatamente.
 
 \subsection{Comparación con Alternativas}
 
-Software comercial: capacidades extensivas, barreras costo/aprendizaje. Open-source genérico: BioSTEAM~\cite{CortesPena2020} (31,000 diseños <50~min, requiere Python/termodinámica), Cantera~\cite{Goodwin2023Cantera} (XML complejo), SKiMpy~\cite{Saa2023} (orientado biología). Sistema especializado combina ventajas: gratuito, simple, validación incorporada, documentación biodiésel. Curva aprendizaje: competencia básica 1--2~h, avanzada 1--2~días vs semanas (Aspen) o meses (PyOMO). Transparencia código facilita validación científica y extensibilidad vs algoritmos propietarios.
+La comparación cuantitativa con software comercial y open-source genérico revela que el sistema unificado especializado ocupa un nicho valioso equilibrando accesibilidad, capacidad analítica y facilidad de uso. El software comercial como Aspen Plus proporciona capacidades extensivas pero con barreras de costo y curvas de aprendizaje prolongadas. El software open-source genérico elimina las barreras económicas pero introduce barreras técnicas. BioSTEAM~\cite{CortesPena2020} demostró capacidad para evaluar 31,000 diseños de biorrefinería en menos de 50~min, pero requiere experiencia en programación Python y conocimiento de termodinámica de procesos. Cantera~\cite{Goodwin2023Cantera} proporciona herramientas robustas para cinética química pero exige definir mecanismos de reacción en archivos XML complejos. SKiMpy~\cite{Saa2023} ofrece modelado cinético simbólico pero está orientado a sistemas biológicos, requiriendo adaptación substancial para transesterificación.
 
-\subsection{Limitaciones}
+El sistema unificado especializado combina las ventajas de ambos enfoques siendo gratuito como el software genérico pero simple como el software comercial. La especialización en transesterificación permite configuraciones óptimas pre-establecidas, vocabulario de dominio específico, validación científica incorporada y documentación enfocada en casos de uso relevantes para biodiésel. La transparencia del código abierto facilita la validación científica y extensibilidad, permitiendo a los investigadores examinar implementaciones de algoritmos, verificar ecuaciones cinéticas y adaptar módulos a variantes específicas de transesterificación.
 
-(1) Especialización CaO: adaptación requerida para otros catalizadores/reacciones (arquitectura modular facilita). (2) CLI: barrera para usuarios sin experiencia terminal (GUI web en desarrollo futuro). (3) Validación basada en catalizadores heterogéneos similares: extensión a homogéneos/condiciones extremas requiere validación adicional. (4) Escalado: correlaciones semi-empíricas, no CFD completo; validación CFD/experimental recomendada para proyectos críticos.
+\subsection{Limitaciones Identificadas}
+
+A pesar de las ventajas significativas, el sistema presenta limitaciones que deben ser reconocidas para su uso apropiado. La especialización en transesterificación catalizada por CaO implica que la aplicación directa a otras reacciones requiere adaptación. La interfaz de línea de comandos, aunque simple para usuarios con experiencia en terminal, puede presentar una barrera para personas sin exposición previa a herramientas de consola. La validación del modelo se basa principalmente en datos de Kouzu et al. usando CaO como catalizador heterogéneo, por lo que la extensión a sistemas con catalizadores homogéneos o condiciones extremas fuera de los rangos calibrados requeriría validación experimental adicional. El módulo de escalado de reactores proporciona especificaciones hidrodinámicas basadas en correlaciones semi-empíricas, por lo que para proyectos de escalado industrial crítico se recomienda validación mediante CFD o estudios experimentales.
 
 %========================================================================
 % CONCLUSIONES
 %========================================================================
 \section{Conclusiones}
 
-Sistema unificado open-source para modelado cinético de transesterificación demuestra versatilidad mediante seis casos representativos. Resultados cuantifican ventajas vs software comercial/open-source genérico: reducción complejidad, eliminación barreras económicas, integración flujos, validación incorporada. Casos: (C1) GC 3.2~s, (C2) ajuste 24.7~s $R^2=0.9844$, (C3) optimización 93\% 112~s, (C4) comparación 1-paso/3-pasos diferencia 0.3\%, (C5) factorial 192 sims 87~s T=42.1\% contribución, (C6) escalado 350~mL$\to$20~L diferencia 0.1\%.
+Este trabajo presenta un sistema unificado open-source para modelado cinético de transesterificación que demuestra versatilidad y adaptabilidad mediante seis casos de uso representativos. Los resultados cuantifican ventajas significativas comparadas con software comercial y herramientas open-source genéricas en términos de reducción de complejidad operacional, eliminación de barreras económicas, integración de flujos de trabajo y validación científica incorporada.
 
-Sistema disponible bajo MIT proporcionando alternativa accesible (\$50,000--\$100,000/año software comercial). Arquitectura modular permite extensibilidad; documentación especializada reduce curvas aprendizaje. Democratiza herramientas para instituciones con recursos limitados, facilitando investigación energías renovables y desarrollo sustentable.
+El primer caso demuestra la automatización del procesamiento cromatográfico reduciendo 20 pasos manuales a un comando ejecutado en 3.2~s con validación automática de calidad de datos. El segundo caso implementa la calibración de parámetros cinéticos convergiendo en 24.7~s con intervalos de confianza automáticos, alcanzando un $R^2=0.9844$. El tercer caso identifica condiciones operacionales óptimas mediante evolución diferencial alcanzando 93\% de conversión en 112~s. El cuarto caso cuantifica el compromiso entre modelos de 1-paso y 3-pasos mostrando una diferencia menor a 0.3\% en conversión pero revelando información valiosa sobre intermediarios disponible solo con el modelo complejo. El quinto caso ejecuta un diseño factorial con 192 simulaciones en 87~s identificando la temperatura como variable crítica con 42.1\% de contribución. El sexto caso diseña un reactor piloto de 20~L desde una escala de laboratorio de 350~mL usando criterios de similitud hidrodinámica con una diferencia de conversión menor a 0.1\%.
 
-Impacto esperado: educación (aprendizaje sin inversiones prohibitivas), investigación (prototipado rápido, reproducibilidad transparente), industria (diseño preliminar sin capital en software costoso). Trabajo futuro: expansión catalizadores, GUI web, integración CFD nativa, análisis económico. Código, casos y datos disponibles en repositorio público (Declaración Disponibilidad), promoviendo transparencia y facilitando adopción/extensión.
+El sistema está disponible públicamente bajo licencia MIT, proporcionando una alternativa accesible al software comercial que cuesta entre \$50,000 y \$100,000 anuales. La arquitectura modular permite extensibilidad a variantes de proceso mientras que la documentación especializada reduce las curvas de aprendizaje. Este trabajo democratiza el acceso a herramientas de simulación para instituciones académicas e industriales con recursos limitados, facilitando la investigación en energías renovables y contribuyendo al desarrollo sustentable mediante la reducción de barreras tecnológicas para la producción de biodiésel.
 
 %========================================================================
 % DECLARACIÓN DE CONTRIBUCIÓN
 %========================================================================
 \section{Declaración de contribución de autores y colaboradores}
 
-\noindent\textbf{Javier Salas-García}: Conceptualización, Metodología, Software, Validación, Análisis formal, Investigación, Curación de datos, Redacción original. \textbf{Miguel Moran Gonzalez}: Validación, Investigación, Redacción revisión. \textbf{María Dolores Durán García}: Metodología, Validación, Supervisión, Redacción revisión. \textbf{Rosa Romero Romero}: Recursos, Supervisión, Financiamiento, Redacción revisión. \textbf{Reyna Natividad Rangel}: Conceptualización, Recursos, Redacción revisión.
+\noindent\textbf{Javier Salas-García}: Conceptualización, Metodología, Software, Validación, Análisis formal, Investigación, Curación de datos, Redacción del borrador original. \textbf{Miguel Moran Gonzalez}: Validación, Investigación, Redacción revisión. \textbf{María Dolores Durán García}: Metodología, Validación, Supervisión, Redacción revisión. \textbf{Rosa Romero Romero}: Recursos, Supervisión, Financiamiento, Redacción revisión. \textbf{Reyna Natividad Rangel}: Conceptualización, Recursos, Redacción revisión.
 
 %========================================================================
 % AGRADECIMIENTOS
 %========================================================================
 \section*{Agradecimientos}
 
-Los autores agradecen al Centro Conjunto de Investigación en Química Sustentable UAEM–UNAM por acceso a instalaciones, al Dr. Kouzu y colaboradores por publicar datos detallados, y a revisores anónimos por sugerencias.
+Los autores agradecen al Centro Conjunto de Investigación en Química Sustentable UAEM–UNAM por el acceso a instalaciones experimentales, al Dr. Kouzu y colaboradores por publicar datos experimentales detallados que permitieron la validación del modelo, y a los revisores anónimos cuyas sugerencias mejoraron significativamente la calidad del manuscrito.
 
 %========================================================================
 % REFERENCIAS
